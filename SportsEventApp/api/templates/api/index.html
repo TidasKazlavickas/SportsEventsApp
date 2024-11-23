@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sum Calculator</title>
+</head>
+<body>
+<h1>Sum Calculator</h1>
+
+<!-- Input Fields -->
+<input type="number" id="num1" placeholder="Enter first number">
+<input type="number" id="num2" placeholder="Enter second number">
+
+<!-- Calculate Button -->
+<button onclick="calculateSum()">Calculate</button>
+
+<!-- Result Display -->
+<h2>Result: <span id="result"></span></h2>
+
+<!-- JavaScript to handle API request -->
+<script>
+    function calculateSum() {
+        // Get the values from input fields
+        const num1 = document.getElementById('num1').value;
+        const num2 = document.getElementById('num2').value;
+
+        // Check if both numbers are entered
+        if (num1 === '' || num2 === '') {
+            alert('Please enter both numbers.');
+            return;
+        }
+
+        // Make an API request to the Django backend
+        fetch(`/sum/?a=${num1}&b=${num2}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.result !== undefined) {
+                    document.getElementById('result').innerText = data.result;
+                } else {
+                    document.getElementById('result').innerText = 'Error';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'Error fetching result';
+            });
+    }
+</script>
+</body>
+</html>
