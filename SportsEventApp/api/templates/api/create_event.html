@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naujo renginio kūrimas</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1>Naujo renginio kūrimas</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Bėgimo pavadinimas -->
+        <h3>Bėgimo pavadinimas:</h3>
+        <div>
+            {{ event_form.title }}
+        </div>
+
+        <!-- Bėgimui reikalingi laukeliai -->
+        <h3>Bėgimui reikalingi laukeliai:</h3>
+        <input type="checkbox" id="select_all"> Žymėti visus
+        {{ event_form.required_fields }}
+
+        <!-- Reglamentai -->
+        <h3>Reglamentai</h3>
+        <div>
+            <label for="lt_regulations">Reglamentas LT:</label>
+            {{ event_form.lt_regulations }}
+        </div>
+        <div>
+            <label for="en_regulations">Reglamentas EN:</label>
+            {{ event_form.en_regulations }}
+        </div>
+
+        <!-- Registracijos terminas -->
+        <h3>Registracijos terminas</h3>
+        {{ event_form.registration_deadline }}
+
+        <!-- Renginio logotipas -->
+        <h3>Renginio logotipas</h3>
+        {{ event_form.logo }}
+
+        <!-- Grupės -->
+        <h3>Grupės</h3>
+        {{ group_formset.management_form }}
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Pavadinimas</th>
+                <th>Metai nuo</th>
+                <th>Metai iki</th>
+                <th>Vyras</th>
+                <th>Moteris</th>
+                <th>Rikiavimo numeris</th>
+                <th>Pašalinti</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for form in group_formset %}
+                <tr>
+                    <td>{{ form.name }}</td>
+                    <td>{{ form.year_from }}</td>
+                    <td>{{ form.year_to }}</td>
+                    <td>{{ form.gender_male }}</td>
+                    <td>{{ form.gender_female }}</td>
+                    <td>{{ form.sorting_number }}</td>
+                    <td>
+                        {% if form.instance.pk %}
+                            <input type="checkbox" name="{{ form.prefix }}-DELETE">
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Bėgimo distancijos -->
+        <h3>Bėgimo distancijos:</h3>
+        {{ distance_form.as_p }}
+        <button type="submit" class="btn btn-primary">Pridėti distanciją</button>
+
+        <!-- Mygtukai -->
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn btn-success">Išsaugoti</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript „Žymėti visus“ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.querySelector('#select_all');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+        });
+    });
+</script>
+</body>
+</html>
