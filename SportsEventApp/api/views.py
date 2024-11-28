@@ -5,9 +5,8 @@ from django.http import JsonResponse
 from django.db import connections
 from django.db.utils import OperationalError
 from django.forms import modelformset_factory
-from .models import Event, Group
+from .models import Event, Group, RaceDistance
 from .forms import EventForm, GroupForm, RaceDistanceForm
-
 
 
 @api_view(['GET'])
@@ -61,10 +60,6 @@ def event_list(request):
         "query": query,
     })
 
-from django.shortcuts import render, redirect
-from django.forms import modelformset_factory
-from .forms import EventForm, GroupForm, RaceDistanceForm
-from .models import Group, RaceDistance
 
 def create_event(request):
     # Grupės formset
