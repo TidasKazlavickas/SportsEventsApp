@@ -16,9 +16,15 @@ class Event(models.Model):
     required_participant_fields = models.CharField(db_column="Required_participant_fields")
     reglament_lt = models.CharField(db_column='Reglament_LT')
     reglament_en = models.CharField(db_column='Reglament_EN')
+    registration_deadline = models.DateField(db_column='Registration_deadline', null=True, blank=True)
+    payment_project_id = models.CharField(db_column='Payment_project_id', max_length=255, blank=True, null=True)
+    payment_password = models.CharField(db_column='Payment_password', max_length=255, blank=True, null=True)
+    event_result_link = models.CharField(db_column='Event_result_link', max_length=500, blank=True, null=True)
+
 
     class Meta:
         db_table = 'sports_event'
+
 
 class Distance(models.Model):
     name_lt = models.CharField(db_column='Name_LT')
@@ -33,3 +39,4 @@ class Distance(models.Model):
 
     class Meta:
         db_table = 'Distance'
+

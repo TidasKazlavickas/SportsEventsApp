@@ -14,9 +14,14 @@ class EventForm(forms.Form):
     is_shirt_size_required = forms.BooleanField(required=False, label='Marškinėlių dydis')
     is_phone_required = forms.BooleanField(required=False, label='Telefonas')
     is_sportident_required = forms.BooleanField(required=False, label='Sportident')
+    registration_deadline = forms.DateField(required=False,label='Registracijos pabaigos data',widget=forms.DateInput(attrs={'type': 'date'}))
 
     reglament_lt = forms.CharField(required=False, max_length=500, label='Reglamentas LT', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą LT'}))
     reglament_en = forms.CharField(required=False, max_length=500, label='Reglamentas EN', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą EN'}))
+
+    payment_project_id = forms.CharField(required=False, max_length=255, label='Payment Project ID', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite mokėjimo projekto ID'}))
+    payment_password = forms.CharField(required=False, max_length=255, label='Payment Password', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite mokėjimo slaptažodi'}))
+    event_result_link = forms.CharField(required=False, max_length=500, label='Event Result Link', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite renginio nuoroda rodoma rezultatuose'}))
 
     def clean_required_participant_fields(self):
         # Construct the "JSON-like" string from the form data
@@ -58,3 +63,4 @@ class DistanceForm(forms.Form):
     extra_price_date = forms.DateField(required=False, label="Data nuo")
     if_race = forms.BooleanField(required=False, label='Estafetė?')
     race_participant_count = forms.IntegerField(required=False, label='Dalyvių skaičius')
+

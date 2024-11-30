@@ -18,13 +18,21 @@ def create_event(request):
             required_participant_fields = event_form.cleaned_data['required_participant_fields']
             reglament_lt = event_form.cleaned_data['reglament_lt']
             reglament_en = event_form.cleaned_data['reglament_en']
+            registration_deadline = event_form.cleaned_data['registration_deadline']
+            payment_project_id = event_form.cleaned_data['payment_project_id']
+            payment_password = event_form.cleaned_data['payment_password']
+            event_result_link = event_form.cleaned_data['event_result_link']
 
             # Create a new Event instance and save to the database
             event = Event(
                 name=event_name,
                 required_participant_fields=required_participant_fields,  # Save as a string resembling JSON
                 reglament_lt=reglament_lt,
-                reglament_en=reglament_en
+                reglament_en=reglament_en,
+                registration_deadline=registration_deadline,
+                payment_project_id=payment_project_id,
+                payment_password=payment_password,
+                event_result_link=event_result_link,
             )
             event.save()
             return redirect('create_event')  # Redirect to refresh the page
@@ -51,6 +59,7 @@ def create_event(request):
             participant_group.save()
             return redirect('create_event')  # Redirect to refresh the page
         elif 'submit_distance' in request.POST and distance_form.is_valid():
+            # Serialize data to JSON
             numbers_data = json.dumps({
                 'numbers_from': distance_form.cleaned_data['numbers_from'],
                 'numbers_to': distance_form.cleaned_data['numbers_to']
@@ -59,10 +68,9 @@ def create_event(request):
                 'special_numbers_from': distance_form.cleaned_data['extra_numbers_from'],
                 'special_numbers_to': distance_form.cleaned_data['extra_numbers_to']
             })
-            if not distance_form.cleaned_data['if_race']:
-                participant_count = None
-            else:
-                participant_count = distance_form.cleaned_data['race_participant_count']
+            participant_count = None if not distance_form.cleaned_data['if_race'] else distance_form.cleaned_data['race_participant_count']
+
+            # Create and save the Distance object
             distance = Distance(
                 name_lt=distance_form.cleaned_data['name_lt'],
                 name_en=distance_form.cleaned_data['name_en'],
@@ -74,9 +82,8 @@ def create_event(request):
                 if_race=distance_form.cleaned_data['if_race'],
                 race_participant_count=participant_count
             )
-            print(distance)
             distance.save()
-            # return redirect('create_event')  # Redirect to refresh the page
+            return redirect('create_event')  # Redirect to refresh the page
     else:
         event_form = EventForm()
         group_form = GroupForm()
@@ -96,3 +103,4 @@ def create_event(request):
                 group.age_to = None
 
     return render(request, 'api/create_event.html', {'event_form': event_form, 'group_form': group_form, 'distance_form':distance_form, 'groups': groups})
+
