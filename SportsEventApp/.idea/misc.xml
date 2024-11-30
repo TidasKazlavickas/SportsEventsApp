@@ -3,8 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.10" />
   </component>
-  <component name="GithubDefaultAccount">
-    <option name="defaultAccountId" value="d4dae8ec-9049-4395-bcc2-8b070769e5ed" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="Python 3.10" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="Python 3.10 (DjangoPythonProjectSetuptest)" project-jdk-type="Python SDK" />
 </project>
