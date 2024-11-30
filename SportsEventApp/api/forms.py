@@ -1,7 +1,7 @@
 from django import forms
 
 class EventForm(forms.Form):
-    event_name = forms.CharField(max_length=200, label='Bėgimo pavadinimas', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite bėgimo pavadinimą'}))
+    event_name = forms.CharField(required=False, max_length=200, label='Bėgimo pavadinimas', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite bėgimo pavadinimą'}))
 
     # Checkboxes for Required Fields
     is_name_required = forms.BooleanField(required=False, label='Vardas')
@@ -15,8 +15,8 @@ class EventForm(forms.Form):
     is_phone_required = forms.BooleanField(required=False, label='Telefonas')
     is_sportident_required = forms.BooleanField(required=False, label='Sportident')
 
-    reglament_lt = forms.CharField(max_length=500, label='Reglamentas LT', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą LT'}))
-    reglament_en = forms.CharField(max_length=500, label='Reglamentas EN', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą EN'}))
+    reglament_lt = forms.CharField(required=False, max_length=500, label='Reglamentas LT', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą LT'}))
+    reglament_en = forms.CharField(required=False, max_length=500, label='Reglamentas EN', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą EN'}))
 
     def clean_required_participant_fields(self):
         # Construct the "JSON-like" string from the form data
@@ -40,21 +40,21 @@ class EventForm(forms.Form):
         return fields_str
 
 class GroupForm(forms.Form):
-    name = forms.CharField(max_length=100, label='Pavadinimas')
-    age_from = forms.IntegerField(label='Metai nuo')
-    age_to = forms.IntegerField(label='Metai iki')
+    name = forms.CharField(required=False, max_length=100, label='Pavadinimas')
+    age_from = forms.IntegerField(required=False, label='Metai nuo')
+    age_to = forms.IntegerField(required=False, label='Metai iki')
     male = forms.BooleanField(required=False, label='Vyrai')
     female = forms.BooleanField(required=False, label='Moterys')
 
 class DistanceForm(forms.Form):
-    name_lt = forms.CharField(max_length=100, label='Pavadinimas LT')
-    name_en = forms.CharField(max_length=100, label='Pavadinimas EN')
-    numbers_from = forms.IntegerField(label='Numeriai nuo')
-    numbers_to = forms.IntegerField(label='Numeriai iki')
-    extra_numbers_from = forms.IntegerField(label='Papildomi numeriai nuo')
-    extra_numbers_to = forms.IntegerField(label='Papildomi numberiai iki')
-    price = forms.CharField(max_length=10, label='Kaina')
-    extra_price = forms.CharField(max_length=10, label='Papildoma kaina')
-    extra_price_date = forms.DateField(label="Data nuo")
+    name_lt = forms.CharField(required=False, max_length=100, label='Pavadinimas LT')
+    name_en = forms.CharField(required=False, max_length=100, label='Pavadinimas EN')
+    numbers_from = forms.IntegerField(required=False, label='Numeriai nuo')
+    numbers_to = forms.IntegerField(required=False, label='Numeriai iki')
+    extra_numbers_from = forms.IntegerField(required=False, label='Papildomi numeriai nuo')
+    extra_numbers_to = forms.IntegerField(required=False, label='Papildomi numberiai iki')
+    price = forms.CharField(required=False, max_length=10, label='Kaina')
+    extra_price = forms.CharField(required=False, max_length=10, label='Papildoma kaina')
+    extra_price_date = forms.DateField(required=False, label="Data nuo")
     if_race = forms.BooleanField(required=False, label='Estafetė?')
-    race_participant_count = forms.IntegerField(label='Dalyvių skaičius')
+    race_participant_count = forms.IntegerField(required=False, label='Dalyvių skaičius')

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import EventForm, GroupForm, DistanceForm
-from .models import Group, Event
+from .models import Group, Event, Distance
 import json
 
 def index(request):
@@ -50,8 +50,33 @@ def create_event(request):
             )
             participant_group.save()
             return redirect('create_event')  # Redirect to refresh the page
-        elif 'submit_distance' in request.POST and event_form.is_valid():
-            return redirect('create_event')  # Redirect to refresh the page
+        elif 'submit_distance' in request.POST and distance_form.is_valid():
+            numbers_data = json.dumps({
+                'numbers_from': distance_form.cleaned_data['numbers_from'],
+                'numbers_to': distance_form.cleaned_data['numbers_to']
+            })
+            special_numbers_data = json.dumps({
+                'special_numbers_from': distance_form.cleaned_data['extra_numbers_from'],
+                'special_numbers_to': distance_form.cleaned_data['extra_numbers_to']
+            })
+            if not distance_form.cleaned_data['if_race']:
+                participant_count = None
+            else:
+                participant_count = distance_form.cleaned_data['race_participant_count']
+            distance = Distance(
+                name_lt=distance_form.cleaned_data['name_lt'],
+                name_en=distance_form.cleaned_data['name_en'],
+                numbers=numbers_data,
+                special_numbers=special_numbers_data,
+                price=distance_form.cleaned_data['price'],
+                price_extra=distance_form.cleaned_data['extra_price'],
+                price_extra_date=distance_form.cleaned_data['extra_price_date'],
+                if_race=distance_form.cleaned_data['if_race'],
+                race_participant_count=participant_count
+            )
+            print(distance)
+            distance.save()
+            # return redirect('create_event')  # Redirect to refresh the page
     else:
         event_form = EventForm()
         group_form = GroupForm()

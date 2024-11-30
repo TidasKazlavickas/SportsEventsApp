@@ -12,7 +12,6 @@ class Group(models.Model):
         return self.name
 
 class Event(models.Model):
-    id = models.IntegerField(db_column="Id", primary_key=True)
     name = models.CharField(db_column='Name')
     required_participant_fields = models.CharField(db_column="Required_participant_fields")
     reglament_lt = models.CharField(db_column='Reglament_LT')
@@ -20,3 +19,17 @@ class Event(models.Model):
 
     class Meta:
         db_table = 'sports_event'
+
+class Distance(models.Model):
+    name_lt = models.CharField(db_column='Name_LT')
+    name_en = models.CharField(db_column='Name_EN')
+    numbers = models.CharField(db_column='Numbers')
+    special_numbers = models.CharField(db_column='Special_numbers')
+    price = models.CharField(db_column='Price')
+    price_extra = models.CharField(db_column='Price_extra')
+    price_extra_date = models.DateField(db_column='Price_extra_date')
+    if_race = models.BooleanField(db_column='If_race')
+    race_participant_count = models.IntegerField(db_column='Race_participant_count')
+
+    class Meta:
+        db_table = 'Distance'
