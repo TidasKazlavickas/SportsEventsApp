@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm
-from .models import Group, Event, Distance, EventDistanceAssociation
+from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
+from .models import Group, Event, Distance, EventDistanceAssociation, Participant
 import json
 
 def event_list(request):
@@ -132,12 +132,15 @@ def create_event(request):
 
 def register_participant(request):
     if request.method == 'POST':
-        form = ParticipantRegistrationForm(request.POST)
-        if form.is_valid():
+        form = ParticipantForm(request.POST)  # Pass POST data into the form
+        if form.is_valid():  # Ensure the form is valid
             form.save()  # Save the participant to the database
-            return redirect('participant_list')  # Redirect to the participant list or a success page
+            return redirect('register_participant')  # Redirect to the same page to clear the form
+        else:
+            # If form is not valid, show errors
+            print(form.errors)
     else:
-        form = ParticipantRegistrationForm()
+        form = ParticipantForm()  # Create an empty form instance for GET request
 
     return render(request, 'api/register_participant.html', {'form': form})
 
@@ -146,3 +149,7 @@ def update_distances(request):
     distances = EventDistanceAssociation.objects.filter(event_id=event_id)
     distance_list = [{'id': d.distance.id, 'name_lt': d.distance.name_lt} for d in distances]
     return JsonResponse({'distances': distance_list})
+
+def participant_list(request):
+    participants = Participant.objects.all()  # Get all participants
+    return render(request, 'participant_list.html', {'participants': participants})

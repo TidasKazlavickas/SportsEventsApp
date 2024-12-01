@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant List</title>
+</head>
+<body>
+<h1>List of Participants</h1>
+<ul>
+    {% for participant in participants %}
+        <li>{{ participant.first_name }} {{ participant.last_name }} ({{ participant.email }})</li>
+        {% empty %}
+        <li>No participants registered yet.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'register_participant' %}">Register New Participant</a>
+</body>
+</html>

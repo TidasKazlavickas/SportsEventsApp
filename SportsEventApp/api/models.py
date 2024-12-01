@@ -56,22 +56,43 @@ class EventDistanceAssociation(models.Model):
         return f"{self.event.name} - {self.distance.name_lt}"
 
 class Participant(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10)
-    email = models.EmailField()
-    country = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    club = models.CharField(max_length=100)
-    shirt_size = models.CharField(max_length=10)
-    phone_number = models.CharField(max_length=15)
-    comment = models.TextField(blank=True)
-    if_paid = models.BooleanField(default=False)
-    if_number_received = models.BooleanField(default=False)
-    if_shirt_received = models.BooleanField(default=False)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    distance = models.ForeignKey(Distance, on_delete=models.CASCADE)
+    First_name = models.CharField(max_length=100)
+    Last_name = models.CharField(max_length=100)
+    Date_of_birth = models.DateField()
+    Gender = models.CharField(max_length=10)
+    Email = models.EmailField()
+    Country = models.CharField(max_length=100)
+    City = models.CharField(max_length=100)
+    Club = models.CharField(max_length=100)
+    Shirt_size = models.CharField(max_length=10)
+    Phone_number = models.CharField(max_length=15)
+    Comment = models.TextField(blank=True)
+    If_paid = models.BooleanField(default=False)
+    If_number_received = models.BooleanField(default=False)
+    If_shirt_received = models.BooleanField(default=False)
+
+    # Many-to-many relationships via custom association tables
+    events = models.ManyToManyField(Event, through='EventParticipantAssociation')
+    distances = models.ManyToManyField(Distance, through='DistanceParticipantAssociation')
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        db_table = 'participant'  # Custom table name in the database
+
+
+class EventParticipantAssociation(models.Model):
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="event_participations")
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="participant_associations")
+
+    class Meta:
+        db_table = 'event_participant_association'
+
+
+class DistanceParticipantAssociation(models.Model):
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="distance_participations")
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE, related_name="participant_associations")
+
+    class Meta:
+        db_table = 'distance_participant_association'
