@@ -26,10 +26,26 @@ def create_event(request):
             payment_password = event_form.cleaned_data['payment_password']
             event_result_link = event_form.cleaned_data['event_result_link']
 
+            fields = {
+                'Vardas': event_form.cleaned_data.get('is_name_required', False),
+                'Pavardė': event_form.cleaned_data.get('is_surname_required', False),
+                'Gimimo metai': event_form.cleaned_data.get('is_birth_year_required', False),
+                'Lytis': event_form.cleaned_data.get('is_gender_required', False),
+                'El. paštas': event_form.cleaned_data.get('is_email_required', False),
+                'Miestas': event_form.cleaned_data.get('is_city_required', False),
+                'Klubas': event_form.cleaned_data.get('is_club_required', False),
+                'Marškinėlių dydis': event_form.cleaned_data.get('is_shirt_size_required', False),
+                'Telefonas': event_form.cleaned_data.get('is_phone_required', False),
+                'Sportident': event_form.cleaned_data.get('is_sportident_required', False),
+            }
+
+            # Creating a string that looks like JSON, but is a plain string
+            # Example: '{"Vardas": true, "Pavardė": false, "Gimimo metai": true}'
+            fields_str = '{' + ', '.join(f'"{key}": {str(value).lower()}' for key, value in fields.items()) + '}'
             # Create a new Event instance and save to the database
             event = Event(
                 name=event_name,
-                required_participant_fields=required_participant_fields,  # Save as a string resembling JSON
+                required_participant_fields=fields_str,  # Save as a string resembling JSON
                 reglament_lt=reglament_lt,
                 reglament_en=reglament_en,
                 registration_deadline=registration_deadline,

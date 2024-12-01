@@ -25,27 +25,6 @@ class EventForm(forms.Form):
     payment_password = forms.CharField(required=False, max_length=255, label='Payment Password', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite mokėjimo slaptažodi'}))
     event_result_link = forms.CharField(required=False, max_length=500, label='Event Result Link', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite renginio nuoroda rodoma rezultatuose'}))
 
-    def clean_required_participant_fields(self):
-        # Construct the "JSON-like" string from the form data
-        fields = {
-            'Vardas': self.cleaned_data.get('is_name_required'),
-            'Pavardė': self.cleaned_data.get('is_surname_required'),
-            'Gimimo metai': self.cleaned_data.get('is_birth_year_required'),
-            'Lytis': self.cleaned_data.get('is_gender_required'),
-            'El. paštas': self.cleaned_data.get('is_email_required'),
-            'Miestas': self.cleaned_data.get('is_city_required'),
-            'Klubas': self.cleaned_data.get('is_club_required'),
-            'Marškinėlių dydis': self.cleaned_data.get('is_shirt_size_required'),
-            'Telefonas': self.cleaned_data.get('is_phone_required'),
-            'Sportident': self.cleaned_data.get('is_sportident_required'),
-        }
-
-        # Creating a string that looks like JSON, but is a plain string
-        # Example: '{"Vardas": true, "Pavardė": false, "Gimimo metai": true}'
-        fields_str = '{' + ', '.join(f'"{key}": {str(value).lower()}' for key, value in fields.items()) + '}'
-        self.cleaned_data['required_participant_fields'] = fields_str
-        return fields_str
-
 class GroupForm(forms.Form):
     name = forms.CharField(required=False, max_length=100, label='Pavadinimas')
     age_from = forms.IntegerField(required=False, label='Metai nuo')
