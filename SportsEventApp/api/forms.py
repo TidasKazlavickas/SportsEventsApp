@@ -1,9 +1,11 @@
 from django import forms
+from .models import Participant, Event, Distance, EventDistanceAssociation
 
 class EventForm(forms.Form):
     event_name = forms.CharField(required=False, max_length=200, label='Bėgimo pavadinimas', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite bėgimo pavadinimą'}))
 
     # Checkboxes for Required Fields
+    required_participant_fields = forms.CharField(widget=forms.HiddenInput(), required=False)
     is_name_required = forms.BooleanField(required=False, label='Vardas')
     is_surname_required = forms.BooleanField(required=False, label='Pavardė')
     is_birth_year_required = forms.BooleanField(required=False, label='Gimimo metai')
@@ -41,7 +43,7 @@ class EventForm(forms.Form):
         # Creating a string that looks like JSON, but is a plain string
         # Example: '{"Vardas": true, "Pavardė": false, "Gimimo metai": true}'
         fields_str = '{' + ', '.join(f'"{key}": {str(value).lower()}' for key, value in fields.items()) + '}'
-
+        self.cleaned_data['required_participant_fields'] = fields_str
         return fields_str
 
 class GroupForm(forms.Form):
@@ -64,3 +66,54 @@ class DistanceForm(forms.Form):
     if_race = forms.BooleanField(required=False, label='Estafetė?')
     race_participant_count = forms.IntegerField(required=False, label='Dalyvių skaičius')
 
+class ParticipantRegistrationForm(forms.ModelForm):
+    gender_choices = [
+        ('male', 'Vyras'),
+        ('female', 'Moteris'),
+    ]
+    # Countries list (add all countries as necessary)
+    countries = [
+        ('LT', 'Lietuva'),
+        ('US', 'Jungtinės Amerikos Valstijos'),
+        # Add other countries as necessary
+    ]
+    # Dynamic Choice for Event and Distance
+    event = forms.ModelChoiceField(queryset=Event.objects.all(), required=True)
+    distance = forms.ModelChoiceField(queryset=Distance.objects.none(), required=True)
+    gender = forms.ChoiceField(choices=gender_choices, required=True)
+    country = forms.ChoiceField(choices=countries, required=True)
+
+    # Participant Fields
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
+    date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=range(1900, 2025)), required=True)
+    email = forms.EmailField(required=True)
+    city = forms.CharField(max_length=100, required=True)
+    club = forms.CharField(max_length=100, required=True)
+    shirt_size = forms.CharField(max_length=10, required=True)
+    phone_number = forms.CharField(max_length=15, required=True)
+    comment = forms.CharField(widget=forms.Textarea, required=False)
+    if_paid = forms.BooleanField(required=False)
+    if_number_received = forms.BooleanField(required=False)
+    if_shirt_received = forms.BooleanField(required=False)
+
+    class Meta:
+        model = Participant
+        fields = [
+            'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'country', 'city', 'club', 'shirt_size',
+            'phone_number', 'comment', 'if_paid', 'if_number_received', 'if_shirt_received', 'event', 'distance'
+        ]
+
+    # Update the distance field dynamically based on the selected event
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'event' in self.data:
+            try:
+                event_id = int(self.data.get('event'))
+                self.fields['distance'].queryset = Distance.objects.filter(
+                    id__in=EventDistanceAssociation.objects.filter(event_id=event_id).values('distance_id')
+                )
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk:
+            self.fields['distance'].queryset = self.instance.event.distances.all()

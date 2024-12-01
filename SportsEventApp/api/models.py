@@ -40,3 +40,30 @@ class Distance(models.Model):
     class Meta:
         db_table = 'Distance'
 
+class EventDistanceAssociation(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.event.name} - {self.distance.name_lt}"
+
+class Participant(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10)
+    email = models.EmailField()
+    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    club = models.CharField(max_length=100)
+    shirt_size = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=15)
+    comment = models.TextField(blank=True)
+    if_paid = models.BooleanField(default=False)
+    if_number_received = models.BooleanField(default=False)
+    if_shirt_received = models.BooleanField(default=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"

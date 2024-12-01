@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Naujo dalyvio registravimas</title>
+    <script type="text/javascript">
+        // Update distances when event is selected
+        function updateDistances(eventId) {
+            let url = "{% url 'update_distances' %}";  // You'll create this URL to fetch distances
+            fetch(url + "?event_id=" + eventId)
+                .then(response => response.json())
+                .then(data => {
+                    let distanceSelect = document.getElementById('id_distance');
+                    distanceSelect.innerHTML = "";
+                    data.distances.forEach(function(distance) {
+                        let option = document.createElement("option");
+                        option.value = distance.id;
+                        option.text = distance.name_lt;
+                        distanceSelect.appendChild(option);
+                    });
+                });
+        }
+    </script>
+</head>
+<body>
+<h1>Naujo dalyvio registravimas</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Registruoti</button>
+</form>
+
+<script type="text/javascript">
+    document.getElementById('id_event').addEventListener('change', function() {
+        updateDistances(this.value);
+    });
+</script>
+</body>
+</html>

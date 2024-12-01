@@ -1,45 +1,20 @@
-<!-- create_event_form.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-    <title>New Event Creation</title>
+    <title>Renginių Sąrašas</title>
 </head>
 <body>
-<h1>New Event Creation</h1>
-<form method="POST">
-    {% csrf_token %}
-    <div>
-        <label>{{ form.event_name.label }}</label>
-        {{ form.event_name }}
-    </div>
+<h1>Renginių Sąrašas</h1>
 
-    <h3>Bėgimui reikalingi laukeliai:</h3>
-    <div>
-        {{ form.is_name_required }} {{ form.is_name_required.label }}
-        {{ form.is_surname_required }} {{ form.is_surname_required.label }}
-        {{ form.is_birth_year_required }} {{ form.is_birth_year_required.label }}
-        {{ form.is_gender_required }} {{ form.is_gender_required.label }}
-        {{ form.is_email_required }} {{ form.is_email_required.label }}
-        {{ form.is_city_required }} {{ form.is_city_required.label }}
-        {{ form.is_club_required }} {{ form.is_club_required.label }}
-        {{ form.is_shirt_size_required }} {{ form.is_shirt_size_required.label }}
-        {{ form.is_phone_required }} {{ form.is_phone_required.label }}
-        {{ form.is_sportident_required }} {{ form.is_sportident_required.label }}
-    </div>
+<ul>
+    {% for event in events %}
+        <li>{{ event.name }}</li>  <!-- Display event name -->
+    {% endfor %}
+</ul>
 
-    <div>
-        <label>{{ form.reglament_lt.label }}</label>
-        {{ form.reglament_lt }}
-    </div>
-
-    <div>
-        <label>{{ form.reglament_en.label }}</label>
-        {{ form.reglament_en }}
-    </div>
-
-    <button type="submit">Submit</button>
+<form method="get" action="{% url 'create_event' %}">
+    <button type="submit">Sukurti naują renginį</button>
 </form>
 </body>
 </html>

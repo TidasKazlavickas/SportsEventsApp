@@ -2,98 +2,21 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renginių zona</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            color: #333;
-        }
-        .event-list {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .event-item {
-            margin: 5px 0;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .event-item:last-child {
-            border-bottom: none;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .search-bar input[type="text"] {
-            padding: 10px;
-            width: 70%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .search-bar button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .search-bar button:hover {
-            background-color: #218838;
-        }
-        .create-button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            border-radius: 5px;
-        }
-        .create-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>Renginių Sąrašas</title>
 </head>
 <body>
-<div class="container">
-    <h1>Renginių zona</h1>
+<h1>Renginių Sąrašas</h1>
 
-    <!-- Paieškos forma -->
-    <div class="search-bar">
-        <form method="GET">
-            <input type="text" name="q" placeholder="Ieškoti bėgimo..." value="{{ query }}">
-            <button type="submit">Ieškoti</button>
-        </form>
-    </div>
 
-    <!-- Renginių sąrašas -->
-    <div class="event-list">
-        {% for event in events %}
-        <div class="event-item">{{ event.name }}</div>
-        {% empty %}
-        <p>Nėra registruotų bėgimų.</p>
-        {% endfor %}
-    </div>
+{% for event in events %}
+    <div>{{ event.name }}</div>
+    {% empty %}
+    <p>No events available.</p>
+{% endfor %}
 
-    <!-- Mygtukas sukurti naują renginį -->
-    <a href="#" class="create-button">Sukurti naują renginį</a>
-</div>
+
+<form method="get" action="{% url 'create_event' %}">
+    <button type="submit">Sukurti naują renginį</button>
+</form>
 </body>
 </html>
