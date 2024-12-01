@@ -54,12 +54,17 @@ class GroupForm(forms.Form):
     female = forms.BooleanField(required=False, label='Moterys')
 
 class DistanceForm(forms.Form):
+    event = forms.ModelChoiceField(
+        queryset=Event.objects.all(),
+        empty_label="Select an event",
+        label='Event'
+    )
     name_lt = forms.CharField(required=False, max_length=100, label='Pavadinimas LT')
     name_en = forms.CharField(required=False, max_length=100, label='Pavadinimas EN')
     numbers_from = forms.IntegerField(required=False, label='Numeriai nuo')
     numbers_to = forms.IntegerField(required=False, label='Numeriai iki')
     extra_numbers_from = forms.IntegerField(required=False, label='Papildomi numeriai nuo')
-    extra_numbers_to = forms.IntegerField(required=False, label='Papildomi numberiai iki')
+    extra_numbers_to = forms.IntegerField(required=False, label='Papildomi numeriai iki')
     price = forms.CharField(required=False, max_length=10, label='Kaina')
     extra_price = forms.CharField(required=False, max_length=10, label='Papildoma kaina')
     extra_price_date = forms.DateField(required=False, label="Data nuo")

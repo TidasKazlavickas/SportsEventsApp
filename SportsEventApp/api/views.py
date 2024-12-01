@@ -86,6 +86,12 @@ def create_event(request):
                 race_participant_count=participant_count
             )
             distance.save()
+
+            # Create and save the association with the selected event
+            selected_event = distance_form.cleaned_data['event']
+            association = EventDistanceAssociation(event=selected_event, distance=distance)
+            association.save()
+
             return redirect('create_event')  # Redirect to refresh the page
     else:
         event_form = EventForm()

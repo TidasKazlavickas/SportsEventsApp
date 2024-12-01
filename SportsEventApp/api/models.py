@@ -25,6 +25,9 @@ class Event(models.Model):
     class Meta:
         db_table = 'sports_event'
 
+    def __str__(self):
+        return self.name
+
 
 class Distance(models.Model):
     name_lt = models.CharField(db_column='Name_LT')
@@ -40,9 +43,14 @@ class Distance(models.Model):
     class Meta:
         db_table = 'Distance'
 
+
+
 class EventDistanceAssociation(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    distance = models.ForeignKey(Distance, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, db_column='Event_Id')
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE, db_column='Distance_Id')
+
+    class Meta:
+        db_table = 'event_distance_association'
 
     def __str__(self):
         return f"{self.event.name} - {self.distance.name_lt}"
