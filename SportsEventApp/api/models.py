@@ -79,12 +79,12 @@ class Participant(models.Model):
         return f"{self.first_name} {self.last_name}"
 
     class Meta:
-        db_table = 'participant'  # Custom table name in the database
+        db_table = 'participant'
 
 
 class EventParticipantAssociation(models.Model):
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="event_participations")
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="participant_associations")
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="event_participations", db_column='Participant_Id')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="participant_associations", db_column='Event_Id')
 
     class Meta:
         db_table = 'event_participant_association'

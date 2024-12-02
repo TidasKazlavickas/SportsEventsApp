@@ -103,28 +103,19 @@ class ParticipantRegistrationForm(forms.ModelForm):
             self.fields['distance'].queryset = self.instance.event.distances.all()
 
 
-class ParticipantForm(forms.Form):
-    first_name = forms.CharField(max_length=100, required=True)
-    last_name = forms.CharField(max_length=100, required=True)
-    date_of_birth = forms.DateField(
-        widget=forms.SelectDateWidget(years=range(1900, 2025)),
-        required=True
-    )
-    email = forms.EmailField(required=True)
-    city = forms.CharField(max_length=100, required=True)
-    club = forms.CharField(max_length=100, required=True)
-    shirt_size = forms.CharField(max_length=10, required=True)
-    phone_number = forms.CharField(max_length=15, required=True)
-    comment = forms.CharField(widget=forms.Textarea, required=False)
-    if_paid = forms.BooleanField(required=False)
-    if_number_received = forms.BooleanField(required=False)
-    if_shirt_received = forms.BooleanField(required=False)
-
+class ParticipantForm(forms.ModelForm):
     class Meta:
         model = Participant
-        fields = ['first_name', 'last_name', 'date_of_birth', 'gender',
-                  'email', 'country', 'city', 'club', 'shirt_size',
-                  'phone_number', 'comment', 'if_paid', 'if_number_received', 'if_shirt_received']
+        fields = [
+            'first_name', 'last_name', 'date_of_birth', 'gender',
+            'email', 'country', 'city', 'club', 'shirt_size',
+            'phone_number', 'comment'
+        ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'gender': forms.Select(choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]),
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')

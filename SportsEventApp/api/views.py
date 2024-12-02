@@ -1,7 +1,7 @@
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
-from .models import Group, Event, Distance, EventDistanceAssociation, Participant
+from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation
 import json
 
 def event_list(request):
@@ -152,4 +152,20 @@ def update_distances(request):
 
 def participant_list(request):
     participants = Participant.objects.all()  # Get all participants
-    return render(request, 'participant_list.html', {'participants': participants})
+    return render(request, 'api/participant_list.html', {'participants': participants})
+
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    participants = Participant.objects.filter(event_participations__event=event)
+
+    if request.method == 'POST':
+        form = ParticipantForm(request.POST)
+        if form.is_valid():
+            participant = form.save()
+            if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
+                EventParticipantAssociation.objects.create(event=event, participant=participant)
+            return redirect('event_detail', event_id=event_id)
+    else:
+        form = ParticipantForm()
+
+    return render(request, 'api/event_detail.html', {'event': event, 'form': form, 'participants': participants})

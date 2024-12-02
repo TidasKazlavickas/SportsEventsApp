@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ event.name }}</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>{{ event.name }}</h1>
+
+<!-- Participant Registration Form -->
+<h2>Registruotis į renginį</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Registruotis</button>
+</form>
+
+<!-- Participant Table -->
+<h2>Dalyvių lentelė</h2>
+{% if participants %}
+    <table>
+        <thead>
+        <tr>
+            <th>Numeris</th>
+            <th>Vardas</th>
+            <th>Pavardė</th>
+            <th>Gimimo data</th>
+            <th>Lytis</th>
+            <th>El.paštas</th>
+            <th>Valstybė</th>
+            <th>Miestas</th>
+            <th>Klubas</th>
+            <th>Registracijos data</th>
+            <th>Nr. išduotas?</th>
+            <th>Marškinėliai priskirti</th>
+            <th>Dydis</th>
+            <th>Komentaras</th>
+            <th>Mokestis</th>
+            <th>Ar sumokėjęs</th>
+            <th>Telefonas</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for participant in participants %}
+            <tr>
+                <td>{{ forloop.counter }}</td> <!-- Row number -->
+                <td>{{ participant.first_name }}</td>
+                <td>{{ participant.last_name }}</td>
+                <td>{{ participant.date_of_birth|date:"Y-m-d" }}</td>
+                <td>{{ participant.gender }}</td>
+                <td>{{ participant.email }}</td>
+                <td>{{ participant.country }}</td>
+                <td>{{ participant.city }}</td>
+                <td>{{ participant.club }}</td>
+                <td>{{ participant.registration_date|date:"Y-m-d H:i:s" }}</td> <!-- Assuming this field exists -->
+                <td>{{ participant.if_number_received|yesno:"Taip,Ne" }}</td>
+                <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>
+                <td>{{ participant.shirt_size }}</td>
+                <td>{{ participant.comment }}</td>
+                <td>{{ participant.payment_amount|default:"-" }}</td> <!-- Add payment field if applicable -->
+                <td>{{ participant.if_paid|yesno:"Taip,Ne" }}</td>
+                <td>{{ participant.phone_number }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Šiuo metu nėra užsiregistravusių dalyvių.</p>
+{% endif %}
+
+<a href="{% url 'event_list' %}">Grįžti į renginių sąrašą</a>
+</body>
+</html>

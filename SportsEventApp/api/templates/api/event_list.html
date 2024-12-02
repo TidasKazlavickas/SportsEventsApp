@@ -7,13 +7,13 @@
 <body>
 <h1>Renginių Sąrašas</h1>
 
-
-{% for event in events %}
-    <div>{{ event.name }}</div>
-    {% empty %}
-    <p>No events available.</p>
-{% endfor %}
-
+<ul>
+    {% for event in events %}
+        <li>
+            <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> <!-- Link with event ID -->
+        </li>
+    {% endfor %}
+</ul>
 
 <form method="get" action="{% url 'create_event' %}">
     <button type="submit">Sukurti naują renginį</button>
