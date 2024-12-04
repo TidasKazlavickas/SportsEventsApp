@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
@@ -134,7 +136,7 @@ def register_participant(request):
     if request.method == 'POST':
         form = ParticipantForm(request.POST)  # Pass POST data into the form
         if form.is_valid():  # Ensure the form is valid
-            form.save()  # Save the participant to the database
+            participant = form.save()
             return redirect('register_participant')  # Redirect to the same page to clear the form
         else:
             # If form is not valid, show errors

@@ -70,6 +70,7 @@ class Participant(models.Model):
     if_paid = models.BooleanField(default=False, db_column='If_paid')
     if_number_received = models.BooleanField(default=False, db_column='If_number_received')
     if_shirt_received = models.BooleanField(default=False, db_column='If_shirt_received')
+    registration_date = models.DateField(auto_now_add=True, db_column='Registration_date')
 
     # Many-to-many relationships via custom association tables
     events = models.ManyToManyField(Event, through='EventParticipantAssociation')
