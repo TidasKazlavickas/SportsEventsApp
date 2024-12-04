@@ -44,6 +44,7 @@
     <table>
         <thead>
         <tr>
+            <th>Veiksmai</th>  <!-- Actions column -->
             <th>Numeris</th>
             <th>Vardas</th>
             <th>Pavardė</th>
@@ -66,7 +67,14 @@
         <tbody>
         {% for participant in participants %}
             <tr>
-                <td>{{ forloop.counter }}</td> <!-- Row number -->
+                <td>
+                    <!-- Change Button -->
+                    <a href="{% url 'edit_participant' participant.id %}" style="background-color: #4CAF50; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti</a>
+
+                    <!-- Delete Button -->
+                    <a href="{% url 'delete_participant' participant.id %}" style="background-color: #f44336; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
+                </td>
+                <td>{{ forloop.counter }}</td>
                 <td>{{ participant.first_name }}</td>
                 <td>{{ participant.last_name }}</td>
                 <td>{{ participant.date_of_birth|date:"Y-m-d" }}</td>
@@ -80,7 +88,7 @@
                 <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.shirt_size }}</td>
                 <td>{{ participant.comment }}</td>
-                <td>{{ participant.payment_amount|default:"-" }}</td> <!-- Add payment field if applicable -->
+                <td>{{ participant.payment_amount|default:"-" }}</td>
                 <td>{{ participant.if_paid|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.phone_number }}</td>
             </tr>

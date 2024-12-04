@@ -212,3 +212,34 @@ def edit_event(request, event_id):
     else:
         # Render the event details page with the event object and required fields
         return render(request, 'api/edit_event.html', {'event': event, 'required_fields': required_fields})
+
+def edit_participant(request, participant_id):
+    # Retrieve the existing participant or return 404 if not found
+    participant = get_object_or_404(Participant, id=participant_id)
+
+    if request.method == 'POST':
+        # Get the updated data from the POST request
+        participant.first_name = request.POST.get('first_name')
+        participant.last_name = request.POST.get('last_name')
+        participant.date_of_birth = request.POST.get('date_of_birth')
+        participant.gender = request.POST.get('gender')
+        participant.email = request.POST.get('email')
+        participant.country = request.POST.get('country')
+        participant.city = request.POST.get('city')
+        participant.club = request.POST.get('club')
+        participant.shirt_size = request.POST.get('shirt_size')
+        participant.phone_number = request.POST.get('phone_number')
+        participant.comment = request.POST.get('comment')
+        event_id = participant.events.first().id
+        # You can add other fields similarly
+
+        # Save the updated participant model instance
+        participant.save()
+
+    return render(request, 'api/edit_participant.html', { 'participant': participant})
+
+def delete_participant(request, participant_id):
+    participant = get_object_or_404(Participant, id=participant_id)
+    event_id = participant.events.first().id  # Get the event associated with the participant
+    participant.delete()  # Delete the participant
+    return redirect('event_detail', event_id=event_id)

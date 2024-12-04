@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Redaguoti dalyvį - {{ participant.first_name }} {{ participant.last_name }}</title>
+</head>
+<body>
+<h1>Redaguoti dalyvį: {{ participant.first_name }} {{ participant.last_name }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="first_name">Vardas</label>
+    <input type="text" id="first_name" name="first_name" value="{{ participant.first_name }}">
+
+    <label for="last_name">Pavardė</label>
+    <input type="text" id="last_name" name="last_name" value="{{ participant.last_name }}">
+
+    <label for="date_of_birth">Gimimo data</label>
+    <input type="date" id="date_of_birth" name="date_of_birth" value="{{ participant.date_of_birth|date:'Y-m-d' }}">
+
+    <label for="gender">Lytis</label>
+    <select id="gender" name="gender">
+        <option value="Male" {% if participant.gender == 'Male' %}selected{% endif %}>Male</option>
+        <option value="Female" {% if participant.gender == 'Female' %}selected{% endif %}>Female</option>
+        <option value="Other" {% if participant.gender == 'Other' %}selected{% endif %}>Other</option>
+    </select>
+
+    <label for="email">El. paštas</label>
+    <input type="email" id="email" name="email" value="{{ participant.email }}">
+
+    <label for="country">Valstybė</label>
+    <input type="text" id="country" name="country" value="{{ participant.country }}">
+
+    <label for="city">Miestas</label>
+    <input type="text" id="city" name="city" value="{{ participant.city }}">
+
+    <label for="club">Klubas</label>
+    <input type="text" id="club" name="club" value="{{ participant.club }}">
+
+    <label for="shirt_size">Marškinėliai dydis</label>
+    <input type="text" id="shirt_size" name="shirt_size" value="{{ participant.shirt_size }}">
+
+    <label for="phone_number">Telefonas</label>
+    <input type="text" id="phone_number" name="phone_number" value="{{ participant.phone_number }}">
+
+    <label for="comment">Komentaras</label>
+    <textarea id="comment" name="comment">{{ participant.comment }}</textarea>
+
+    <button type="submit">Išsaugoti pakeitimus</button>
+</form>
+{% for event in participant.events.all %}
+    {% if forloop.first %}
+        <a href="{% url 'event_detail' event_id=event.id %}">Atšaukti ir grįžti</a>
+    {% endif %}
+{% endfor %}
+
+</body>
+</html>
