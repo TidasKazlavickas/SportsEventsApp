@@ -20,18 +20,81 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+        input[type="text"], select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 <h1>{{ event.name }}</h1>
 
-<!-- Display event details here -->
+<!-- Filter/Search Form -->
+<form method="get">
+    <label for="search_first_name">Vardas:</label>
+    <input type="text" id="search_first_name" name="search_first_name" value="{{ request.GET.search_first_name }}">
 
-<!-- Edit Event Button -->
-<a href="{% url 'edit_event' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti renginį</a>
+    <label for="search_last_name">Pavardė:</label>
+    <input type="text" id="search_last_name" name="search_last_name" value="{{ request.GET.search_last_name }}">
+
+    <label for="search_email">El.paštas:</label>
+    <input type="text" id="search_email" name="search_email" value="{{ request.GET.search_email }}">
+
+    <label for="search_country">Valstybė:</label>
+    <input type="text" id="search_country" name="search_country" value="{{ request.GET.search_country }}">
+
+    <label for="search_status">Statusas:</label>
+    <select id="search_status" name="search_status">
+        <option value="">Visi</option>
+        <option value="paid" {% if request.GET.search_status == "paid" %}selected{% endif %}>Sumokėjęs</option>
+        <option value="not_paid" {% if request.GET.search_status == "not_paid" %}selected{% endif %}>Nesumokėjęs</option>
+    </select>
+
+    <label for="search_number">Dalyvio numeris:</label>
+    <input type="text" id="search_number" name="search_number" value="{{ request.GET.search_number }}">
+
+    <label for="search_gender">Lytis:</label>
+    <select id="search_gender" name="search_gender">
+        <option value="">Visi</option>
+        <option value="Male" {% if request.GET.search_gender == "Male" %}selected{% endif %}>Vyras</option>
+        <option value="Female" {% if request.GET.search_gender == "Female" %}selected{% endif %}>Moteris</option>
+    </select>
+
+    <label for="search_club">Klubas:</label>
+    <input type="text" id="search_club" name="search_club" value="{{ request.GET.search_club }}">
+
+    <label for="search_group">Grupė:</label>
+    <select id="search_group" name="search_group">
+        <option value="">Visos</option>
+        <!-- Add groups dynamically if available -->
+    </select>
+
+    <label for="search_distance">Distancija:</label>
+    <select id="search_distance" name="search_distance">
+        <option value="">Visos</option>
+        <!-- Add distances dynamically if available -->
+    </select>
+
+    <label for="number_received">Nr. išduotas?</label>
+    <input type="checkbox" id="number_received" name="number_received" value="yes" {% if request.GET.number_received == "yes" %}checked{% endif %}>
+
+    <label for="shirt_assigned">Marškinėliai?</label>
+    <input type="checkbox" id="shirt_assigned" name="shirt_assigned" value="yes" {% if request.GET.shirt_assigned == "yes" %}checked{% endif %}>
+
+    <input type="submit" value="Filtruoti">
+</form>
+
+<!-- Display event details here -->
 
 <!-- Add Participant Button -->
 <a href="{% url 'add_participant' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pridėti dalyvį</a>
+
+<!-- Export to CSV Button -->
+<form action="{% url 'export_participants_csv' event.id %}" method="get">
+    <input type="submit" value="Eksportuoti į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+</form>
 
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>

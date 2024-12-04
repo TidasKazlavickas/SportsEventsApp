@@ -11,5 +11,6 @@ urlpatterns = [
     path('edit-event/<int:event_id>/', views.edit_event, name='edit_event'),
     path('edit-participant/<int:participant_id>/', views.edit_participant, name='edit_participant'),
     path('delete-participant/<int:participant_id>/', views.delete_participant, name='delete_participant'),
+    path('event/<int:event_id>/export_participants_csv/', views.export_participants_csv, name='export_participants_csv'),
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
 ]

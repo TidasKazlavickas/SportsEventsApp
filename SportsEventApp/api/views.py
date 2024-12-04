@@ -1,6 +1,7 @@
+import csv
 from datetime import date
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
 from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation
@@ -143,12 +144,65 @@ def participant_list(request):
 
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    participants = Participant.objects.filter(event_participations__event=event)
-    return render(request, 'api/event_detail.html', {'event': event, 'participants': participants})
+    participants = Participant.objects.filter(events__id=event_id)
 
-import json
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Event
+    # Filter by search query parameters
+    search_first_name = request.GET.get('search_first_name', '')
+    search_last_name = request.GET.get('search_last_name', '')
+    search_email = request.GET.get('search_email', '')
+    search_country = request.GET.get('search_country', '')
+    search_status = request.GET.get('search_status', '')
+    search_number = request.GET.get('search_number', '')
+    search_gender = request.GET.get('search_gender', '')
+    search_club = request.GET.get('search_club', '')
+    search_group = request.GET.get('search_group', '')
+    search_distance = request.GET.get('search_distance', '')
+    number_received = request.GET.get('number_received', '')
+    shirt_assigned = request.GET.get('shirt_assigned', '')
+
+    # Apply filters
+    if search_first_name:
+        participants = participants.filter(first_name__icontains=search_first_name)
+
+    if search_last_name:
+        participants = participants.filter(last_name__icontains=search_last_name)
+
+    if search_email:
+        participants = participants.filter(email__icontains=search_email)
+
+    if search_country:
+        participants = participants.filter(country__icontains=search_country)
+
+    if search_status == "paid":
+        participants = participants.filter(if_paid=True)
+    elif search_status == "not_paid":
+        participants = participants.filter(if_paid=False)
+
+    if search_number:
+        participants = participants.filter(id=search_number)
+
+    if search_gender:
+        participants = participants.filter(gender=search_gender)
+
+    if search_club:
+        participants = participants.filter(club__icontains=search_club)
+
+    if search_group:
+        participants = participants.filter(events__group=search_group)
+
+    if search_distance:
+        participants = participants.filter(distances__id=search_distance)
+
+    if number_received == "yes":
+        participants = participants.filter(if_number_received=True)
+
+    if shirt_assigned == "yes":
+        participants = participants.filter(if_shirt_received=True)
+
+    return render(request, 'api/event_detail.html', {
+        'event': event,
+        'participants': participants,
+    })
 
 def edit_event(request, event_id):
     # Retrieve the existing event or return 404 if not found
@@ -232,3 +286,69 @@ def add_participant(request, event_id):
         form = ParticipantForm()
 
     return render(request, 'api/add_participant.html', {'event': event, 'form': form})
+
+def export_participants_csv(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    # Get filtered participants based on the search parameters
+    participants = Participant.objects.filter(events__id=event_id)
+
+    # Get filter parameters from the request
+    search_name = request.GET.get('search_name', '')
+    search_country = request.GET.get('search_country', '')
+    search_city = request.GET.get('search_city', '')
+    search_club = request.GET.get('search_club', '')
+    search_gender = request.GET.get('search_gender', '')
+
+    if search_name:
+        participants = participants.filter(
+            first_name__icontains=search_name) | participants.filter(last_name__icontains=search_name)
+
+    if search_country:
+        participants = participants.filter(country__icontains=search_country)
+
+    if search_city:
+        participants = participants.filter(city__icontains=search_city)
+
+    if search_club:
+        participants = participants.filter(club__icontains=search_club)
+
+    if search_gender:
+        participants = participants.filter(gender=search_gender)
+
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="participants_{event.name}.csv"'
+
+    # Writing the CSV data with proper UTF-8 encoding
+    writer = csv.writer(response, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    # Writing the header row
+    writer.writerow([
+        'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'El.paštas',
+        'Valstybė', 'Miestas', 'Klubas', 'Registracijos data', 'Nr. išduotas?',
+        'Marškinėliai priskirti', 'Dydis', 'Komentaras', 'Mokestis', 'Ar sumokėjęs', 'Telefonas'
+    ])
+
+    # Writing participant data
+    for participant in participants:
+        writer.writerow([
+            participant.id,
+            participant.first_name,
+            participant.last_name,
+            participant.date_of_birth.strftime('%Y-%m-%d') if participant.date_of_birth else "N/A",
+            participant.gender,
+            participant.email,
+            participant.country,
+            participant.city,
+            participant.club,
+            participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
+            'Taip' if participant.if_number_received else 'Ne',
+            'Taip' if participant.if_shirt_received else 'Ne',
+            participant.shirt_size,
+            participant.comment,
+            'Taip' if participant.if_paid else 'Ne',
+            participant.phone_number
+        ])
+
+    return response
