@@ -9,4 +9,5 @@ urlpatterns = [
     path('register-participant/', views.register_participant, name='register_participant'),
     path('update-distances/', views.update_distances, name='update_distances'),  # for AJAX
     path('participants/', views.participant_list, name='participant_list'),
+    path('edit-event/<int:event_id>/', views.edit_event, name='edit_event'),
 ]

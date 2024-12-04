@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Redaguoti renginį - {{ event.name }}</title>
+</head>
+<body>
+<h1>Redaguoti renginį: {{ event.name }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="name">Renginio pavadinimas:</label>
+    <input type="text" id="name" name="name" value="{{ event.name }}"><br><br>
+
+    <label for="required_participant_fields">Reikalingi dalyvio duomenys:</label><br>
+
+    <!-- Dynamically create checkboxes -->
+    <div id="requiredFieldsContainer">
+        {% for field, is_required in required_fields.items %}
+            <div>
+                <input type="checkbox" id="{{ field }}" name="required_participant_fields" value="{{ field }}" {% if is_required %}checked{% endif %}>
+                <label for="{{ field }}">{{ field }}</label>
+            </div>
+        {% endfor %}
+    </div><br><br>
+
+    <label for="reglament_lt">Reglamentas (LT):</label>
+    <textarea id="reglament_lt" name="reglament_lt">{{ event.reglament_lt }}</textarea><br><br>
+
+    <label for="reglament_en">Reglamentas (EN):</label>
+    <textarea id="reglament_en" name="reglament_en">{{ event.reglament_en }}</textarea><br><br>
+
+    <label for="registration_deadline">Registracijos pabaigos data:</label>
+    <input type="date" id="registration_deadline" name="registration_deadline" value="{{ event.registration_deadline|date:'Y-m-d' }}"><br><br>
+
+    <label for="payment_project_id">Mokėjimo projektas ID:</label>
+    <input type="text" id="payment_project_id" name="payment_project_id" value="{{ event.payment_project_id }}"><br><br>
+
+    <label for="payment_password">Mokėjimo slaptažodis:</label>
+    <input type="password" id="payment_password" name="payment_password" value="{{ event.payment_password }}"><br><br>
+
+    <label for="event_result_link">Renginio rezultatų nuoroda:</label>
+    <input type="text" id="event_result_link" name="event_result_link" value="{{ event.event_result_link }}"><br><br>
+
+    <button type="submit">Išsaugoti pakeitimus</button>
+</form>
+
+<a href="{% url 'event_detail' event_id=event.id %}">Atšaukti ir grįžti</a>
+</body>
+</html>

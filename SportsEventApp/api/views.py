@@ -169,3 +169,44 @@ def event_detail(request, event_id):
         form = ParticipantForm()
 
     return render(request, 'api/event_detail.html', {'event': event, 'form': form, 'participants': participants})
+
+import json
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Event
+
+def edit_event(request, event_id):
+    # Retrieve the existing event or return 404 if not found
+    event = get_object_or_404(Event, id=event_id)
+    required_fields = json.loads(event.required_participant_fields)
+
+    if request.method == 'POST':
+        # Extract data from the POST request
+        name = request.POST.get('name')
+        selected_fields = request.POST.getlist('required_participant_fields')
+        # Convert the selected fields back into a dictionary with True for selected, False for not selected
+        updated_required_fields = {field: field in selected_fields for field in required_fields.keys()}
+        reglament_lt = request.POST.get('reglament_lt')
+        reglament_en = request.POST.get('reglament_en')
+        registration_deadline = request.POST.get('registration_deadline')
+        payment_project_id = request.POST.get('payment_project_id')
+        payment_password = request.POST.get('payment_password')
+        event_result_link = request.POST.get('event_result_link')
+
+        # Update the event instance with the new data
+        event.name = name
+        event.required_participant_fields = json.dumps(updated_required_fields)
+        event.reglament_lt = reglament_lt
+        event.reglament_en = reglament_en
+        event.registration_deadline = registration_deadline if registration_deadline else None
+        event.payment_project_id = payment_project_id
+        event.payment_password = payment_password
+        event.event_result_link = event_result_link
+
+        # Save the updated event
+        event.save()
+
+        # Redirect to the event detail page after saving
+        return redirect('event_detail', event_id=event_id)
+    else:
+        # Render the event details page with the event object and required fields
+        return render(request, 'api/edit_event.html', {'event': event, 'required_fields': required_fields})

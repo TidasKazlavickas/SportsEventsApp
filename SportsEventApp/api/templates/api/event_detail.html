@@ -25,6 +25,11 @@
 <body>
 <h1>{{ event.name }}</h1>
 
+<!-- Display event details here -->
+
+<!-- Edit Event Button -->
+<a href="{% url 'edit_event' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti renginį</a>
+
 <!-- Participant Registration Form -->
 <h2>Registruotis į renginį</h2>
 <form method="post">
@@ -70,7 +75,7 @@
                 <td>{{ participant.country }}</td>
                 <td>{{ participant.city }}</td>
                 <td>{{ participant.club }}</td>
-                <td>{{ participant.registration_date|date:"Y-m-d H:i:s" }}</td> <!-- Assuming this field exists -->
+                <td>{{ participant.registration_date|date:"Y-m-d H:i:s" }}</td>
                 <td>{{ participant.if_number_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.shirt_size }}</td>
