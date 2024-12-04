@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pridėti dalyvį - {{ event.name }}</title>
+    <style>
+        /* Your styling here */
+    </style>
+</head>
+<body>
+<h1>Pridėti dalyvį į renginį: {{ event.name }}</h1>
+
+<!-- Participant Registration Form -->
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Pridėti dalyvį</button>
+</form>
+
+<a href="{% url 'event_detail' event_id=event.id %}">Grįžti į renginio detales</a>
+</body>
+</html>

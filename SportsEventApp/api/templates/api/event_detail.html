@@ -30,13 +30,8 @@
 <!-- Edit Event Button -->
 <a href="{% url 'edit_event' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti renginį</a>
 
-<!-- Participant Registration Form -->
-<h2>Registruotis į renginį</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registruotis</button>
-</form>
+<!-- Add Participant Button -->
+<a href="{% url 'add_participant' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pridėti dalyvį</a>
 
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>

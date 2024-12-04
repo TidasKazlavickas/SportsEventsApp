@@ -131,21 +131,6 @@ def create_event(request):
 
     return render(request, 'api/create_event.html', {'event_form': event_form, 'group_form': group_form, 'distance_form':distance_form, 'groups': groups})
 
-
-def register_participant(request):
-    if request.method == 'POST':
-        form = ParticipantForm(request.POST)  # Pass POST data into the form
-        if form.is_valid():  # Ensure the form is valid
-            participant = form.save()
-            return redirect('register_participant')  # Redirect to the same page to clear the form
-        else:
-            # If form is not valid, show errors
-            print(form.errors)
-    else:
-        form = ParticipantForm()  # Create an empty form instance for GET request
-
-    return render(request, 'api/register_participant.html', {'form': form})
-
 def update_distances(request):
     event_id = request.GET.get('event_id')
     distances = EventDistanceAssociation.objects.filter(event_id=event_id)
@@ -159,18 +144,7 @@ def participant_list(request):
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     participants = Participant.objects.filter(event_participations__event=event)
-
-    if request.method == 'POST':
-        form = ParticipantForm(request.POST)
-        if form.is_valid():
-            participant = form.save()
-            if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
-                EventParticipantAssociation.objects.create(event=event, participant=participant)
-            return redirect('event_detail', event_id=event_id)
-    else:
-        form = ParticipantForm()
-
-    return render(request, 'api/event_detail.html', {'event': event, 'form': form, 'participants': participants})
+    return render(request, 'api/event_detail.html', {'event': event, 'participants': participants})
 
 import json
 from django.shortcuts import render, get_object_or_404, redirect
@@ -243,3 +217,18 @@ def delete_participant(request, participant_id):
     event_id = participant.events.first().id  # Get the event associated with the participant
     participant.delete()  # Delete the participant
     return redirect('event_detail', event_id=event_id)
+
+def add_participant(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        form = ParticipantForm(request.POST)
+        if form.is_valid():
+            participant = form.save()
+            # Ensure the event-participant association is created
+            if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
+                EventParticipantAssociation.objects.create(event=event, participant=participant)
+            return redirect('event_detail', event_id=event_id)
+    else:
+        form = ParticipantForm()
+
+    return render(request, 'api/add_participant.html', {'event': event, 'form': form})
