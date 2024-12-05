@@ -366,7 +366,7 @@ def export_participants_csv(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
     # Get filtered participants based on the search parameters
-    participants = Participant.objects.filter(events__id=event_id)
+    participants = Participant.objects.filter(events__id=event_id, if_paid=True)
 
     # Get filter parameters from the request
     search_name = request.GET.get('search_name', '')
