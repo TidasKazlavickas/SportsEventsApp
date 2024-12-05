@@ -211,6 +211,10 @@ def event_detail(request, event_id):
     if shirt_assigned == "yes":
         participants = participants.filter(if_shirt_received=True)
 
+    # Retrieve the associated groups for each participant
+    for participant in participants:
+        participant.groups = Group.objects.filter(participant_groups__participant=participant)
+
     return render(request, 'api/event_detail.html', {
         'event': event,
         'participants': participants,

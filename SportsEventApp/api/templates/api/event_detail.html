@@ -68,7 +68,6 @@
     <label for="search_group">Grupė:</label>
     <select id="search_group" name="search_group">
         <option value="">Visos</option>
-        <!-- Add groups dynamically if available -->
     </select>
 
     <label for="search_distance">Distancija:</label>
@@ -113,6 +112,7 @@
             <th>Valstybė</th>
             <th>Miestas</th>
             <th>Klubas</th>
+            <th>Grupė</th>
             <th>Registracijos data</th>
             <th>Nr. išduotas?</th>
             <th>Marškinėliai priskirti</th>
@@ -142,6 +142,17 @@
                 <td>{{ participant.country }}</td>
                 <td>{{ participant.city }}</td>
                 <td>{{ participant.club }}</td>
+                <td style="text-align: center;">
+                    {% if participant.groups %}
+                        <ul style="list-style-type: none; padding: 0; text-align: center;">
+                            {% for group in participant.groups %}
+                                <li>{{ group.name }}</li> <!-- Adjust according to your group model field -->
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        No group assigned
+                    {% endif %}
+                </td>
                 <td>{{ participant.registration_date|date:"Y-m-d" }}</td>
                 <td>{{ participant.if_number_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>
