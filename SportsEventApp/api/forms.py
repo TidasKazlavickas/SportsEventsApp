@@ -104,18 +104,75 @@ class ParticipantRegistrationForm(forms.ModelForm):
 
 
 class ParticipantForm(forms.ModelForm):
+    gender_choices = [
+        ('male', 'Vyras'),
+        ('female', 'Moteris'),
+        ('other', 'Kita'),
+    ]
+
+    # Participant Fields
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
+    date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=range(1900, 2025)), required=True)
+    email = forms.EmailField(required=True)
+    city = forms.CharField(max_length=100, required=True)
+    club = forms.CharField(max_length=100, required=True)
+    shirt_size = forms.CharField(max_length=10, required=True)
+    phone_number = forms.CharField(max_length=15, required=True)
+    comment = forms.CharField(widget=forms.Textarea, required=False)
+    if_paid = forms.BooleanField(required=False)
+    if_number_received = forms.BooleanField(required=False)
+    if_shirt_received = forms.BooleanField(required=False)
+    shirt_number = forms.CharField(max_length=10, required=False)  # New field for Shirt Number
+
+    # Allow free text input for country
+    country = forms.CharField(max_length=100, required=True)
+
+    # Dynamic Distance field based on the selected event
+    distance = forms.ModelChoiceField(queryset=Distance.objects.none(), required=True)
+
     class Meta:
         model = Participant
         fields = [
-            'first_name', 'last_name', 'date_of_birth', 'gender',
-            'email', 'country', 'city', 'club', 'shirt_size',
-            'phone_number', 'comment'
+            'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'country', 'city', 'club', 'shirt_size',
+            'phone_number', 'comment', 'if_paid', 'if_number_received', 'if_shirt_received', 'shirt_number', 'distance'
         ]
+        labels = {
+            'first_name': 'Vardas',
+            'last_name': 'Pavardė',
+            'date_of_birth': 'Gimimo data',
+            'gender': 'Lytis',
+            'email': 'El. paštas',
+            'country': 'Valstybė',
+            'city': 'Miestas',
+            'club': 'Klubas',
+            'shirt_size': 'Marškinėlių dydis',
+            'phone_number': 'Telefonas',
+            'comment': 'Komentaras',
+            'if_paid': 'Sumokėjęs',
+            'if_number_received': 'Nr. Išduotas',
+            'if_shirt_received': 'Marškiniai išduoti',
+            'shirt_number': 'Numeris',
+            'distance': 'Distancija',
+        }
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
-            'gender': forms.Select(choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]),
+            'gender': forms.Select(choices=[('Male', 'Vyras'), ('Female', 'Moteris'), ('Other', 'Kita')]),
             'comment': forms.Textarea(attrs={'rows': 3}),
+            'distance': forms.Select(),
         }
+
+    # Dynamically update the distance field based on the selected event
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event', None)
+        super().__init__(*args, **kwargs)
+
+        if event:
+            # Filter distances based on the selected event
+            self.fields['distance'].queryset = Distance.objects.filter(
+                id__in=EventDistanceAssociation.objects.filter(event_id=event.id).values('distance_id')
+            )
+
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
@@ -128,3 +185,9 @@ class ParticipantForm(forms.ModelForm):
         if not email:
             raise forms.ValidationError("Email is required.")
         return email
+
+    def clean_shirt_number(self):
+        shirt_number = self.cleaned_data.get('shirt_number')
+        if shirt_number == '':
+            return None
+        return shirt_number

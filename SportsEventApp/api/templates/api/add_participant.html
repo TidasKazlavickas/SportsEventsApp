@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Pridėti dalyvį - {{ event.name }}</title>
-    <style>
-        /* Your styling here */
-    </style>
 </head>
 <body>
 <h1>Pridėti dalyvį į renginį: {{ event.name }}</h1>
@@ -13,7 +10,74 @@
 <!-- Participant Registration Form -->
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <table>
+        <tr>
+            <td><label for="{{ form.first_name.id_for_label }}">Vardas</label></td>
+            <td>{{ form.first_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.last_name.id_for_label }}">Pavardė</label></td>
+            <td>{{ form.last_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.date_of_birth.id_for_label }}">Gimimo data</label></td>
+            <td>{{ form.date_of_birth }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.gender.id_for_label }}">Lytis</label></td>
+            <td>{{ form.gender }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.email.id_for_label }}">El. paštas</label></td>
+            <td>{{ form.email }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.country.id_for_label }}">Valstybė</label></td>
+            <td>{{ form.country }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.city.id_for_label }}">Miestas</label></td>
+            <td>{{ form.city }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.club.id_for_label }}">Klubas</label></td>
+            <td>{{ form.club }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.shirt_size.id_for_label }}">Marškinėlių dydis</label></td>
+            <td>{{ form.shirt_size }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.phone_number.id_for_label }}">Telefonas</label></td>
+            <td>{{ form.phone_number }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.comment.id_for_label }}">Komentaras</label></td>
+            <td>{{ form.comment }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_paid.id_for_label }}">Sumokėjęs</label></td>
+            <td>{{ form.if_paid }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_number_received.id_for_label }}">Nr. Išduotas</label></td>
+            <td>{{ form.if_number_received }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_shirt_received.id_for_label }}">Marškiniai išduoti</label></td>
+            <td>{{ form.if_shirt_received }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.shirt_number.id_for_label }}">Numeris</label></td>
+            <td>{{ form.shirt_number }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.distance.id_for_label }}">Distancija</label></td>
+            <td>{{ form.distance }}</td>
+        </tr>
+    </table>
+
     <button type="submit">Pridėti dalyvį</button>
 </form>
 

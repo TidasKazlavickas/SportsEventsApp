@@ -30,18 +30,21 @@ class Event(models.Model):
 
 
 class Distance(models.Model):
-    name_lt = models.CharField(db_column='Name_LT')
-    name_en = models.CharField(db_column='Name_EN')
-    numbers = models.CharField(db_column='Numbers')
-    special_numbers = models.CharField(db_column='Special_numbers')
-    price = models.CharField(db_column='Price')
-    price_extra = models.CharField(db_column='Price_extra')
+    name_lt = models.CharField(db_column='Name_LT', max_length=255)
+    name_en = models.CharField(db_column='Name_EN', max_length=255)
+    numbers = models.JSONField(db_column='Numbers', max_length=255)
+    special_numbers = models.CharField(db_column='Special_numbers', max_length=255)
+    price = models.CharField(db_column='Price', max_length=255)
+    price_extra = models.CharField(db_column='Price_extra', max_length=255)
     price_extra_date = models.DateField(db_column='Price_extra_date')
     if_race = models.BooleanField(db_column='If_race')
     race_participant_count = models.IntegerField(db_column='Race_participant_count')
 
     class Meta:
         db_table = 'Distance'
+
+    def __str__(self):
+        return self.name_lt
 
 
 
@@ -71,6 +74,7 @@ class Participant(models.Model):
     if_number_received = models.BooleanField(default=False, db_column='If_number_received')
     if_shirt_received = models.BooleanField(default=False, db_column='If_shirt_received')
     registration_date = models.DateField(auto_now_add=True, db_column='Registration_date')
+    shirt_number = models.IntegerField(db_column='Shirt_number')
 
     # Many-to-many relationships via custom association tables
     events = models.ManyToManyField(Event, through='EventParticipantAssociation')

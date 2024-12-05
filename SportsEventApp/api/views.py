@@ -3,8 +3,11 @@ from datetime import date
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.encoding import smart_str
+
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
-from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation
+from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation, \
+    DistanceParticipantAssociation
 import json
 
 def event_list(request):
@@ -245,26 +248,50 @@ def edit_participant(request, participant_id):
     # Retrieve the existing participant or return 404 if not found
     participant = get_object_or_404(Participant, id=participant_id)
 
+    # Retrieve the associated event (assuming the participant has at least one event)
+    event = participant.events.first()
+
+    # Retrieve the associated distance for the participant, if any
+    distance_association = DistanceParticipantAssociation.objects.filter(participant=participant).first()
+    selected_distance = distance_association.distance if distance_association else None
+
     if request.method == 'POST':
-        # Get the updated data from the POST request
-        participant.first_name = request.POST.get('first_name')
-        participant.last_name = request.POST.get('last_name')
-        participant.date_of_birth = request.POST.get('date_of_birth')
-        participant.gender = request.POST.get('gender')
-        participant.email = request.POST.get('email')
-        participant.country = request.POST.get('country')
-        participant.city = request.POST.get('city')
-        participant.club = request.POST.get('club')
-        participant.shirt_size = request.POST.get('shirt_size')
-        participant.phone_number = request.POST.get('phone_number')
-        participant.comment = request.POST.get('comment')
-        event_id = participant.events.first().id
-        # You can add other fields similarly
+        form = ParticipantForm(request.POST, event=event)
+        if form.is_valid():
+            participant = form.save()
 
-        # Save the updated participant model instance
-        participant.save()
+            # Ensure the event-participant association is created
+            if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
+                EventParticipantAssociation.objects.create(event=event, participant=participant)
 
-    return render(request, 'api/edit_participant.html', { 'participant': participant})
+            # Retrieve the selected distance from POST data
+            selected_distance_id = request.POST.get('distance')
+
+            # Ensure the distance exists, and retrieve the Distance object
+            selected_distance = get_object_or_404(Distance, id=selected_distance_id)
+
+            # Create the association between participant and distance
+            if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
+                DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
+
+            # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
+            if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
+                # Get the next available number from the pool (assuming you have a function to fetch the next number)
+                next_available_number = get_next_available_number(selected_distance)
+
+                # Only assign if a valid number is available
+                if next_available_number is not None:
+                    participant.shirt_number = next_available_number
+                    participant.save()
+
+            return redirect('event_detail', event_id=event.id)
+    else:
+        # Populate the form with the current participant data and selected distance
+        form = ParticipantForm(event=event, instance=participant)
+        if selected_distance:
+            form.fields['distance'].initial = selected_distance.id
+
+    return render(request, 'api/edit_participant.html', {'form': form, 'participant': participant, 'event': event})
 
 def delete_participant(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
@@ -272,20 +299,68 @@ def delete_participant(request, participant_id):
     participant.delete()  # Delete the participant
     return redirect('event_detail', event_id=event_id)
 
+import json
+
 def add_participant(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+
     if request.method == 'POST':
-        form = ParticipantForm(request.POST)
+        form = ParticipantForm(request.POST, event=event)
         if form.is_valid():
             participant = form.save()
+
             # Ensure the event-participant association is created
             if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
                 EventParticipantAssociation.objects.create(event=event, participant=participant)
+
+            # Retrieve the selected distance from POST data
+            selected_distance_id = request.POST.get('distance')
+
+            # Ensure the distance exists, and retrieve the Distance object
+            selected_distance = get_object_or_404(Distance, id=selected_distance_id)
+
+            # Create the association between participant and distance
+            if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
+                DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
+
+            # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
+            if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
+                # Get the next available number from the pool (assuming you have a function to fetch the next number)
+                next_available_number = get_next_available_number(selected_distance)
+
+                # Only assign if a valid number is available
+                if next_available_number is not None:
+                    participant.shirt_number = next_available_number
+                    participant.save()
+
             return redirect('event_detail', event_id=event_id)
+
     else:
-        form = ParticipantForm()
+        form = ParticipantForm(event=event)
 
     return render(request, 'api/add_participant.html', {'event': event, 'form': form})
+
+def get_next_available_number(distance):
+    # Directly access the 'numbers' field, which is already a dictionary
+    number_range = distance.numbers  # Assuming 'numbers' is already a dictionary
+
+    numbers_from = number_range.get("numbers_from")
+    numbers_to = number_range.get("numbers_to")
+
+    if numbers_from is None or numbers_to is None:
+        raise ValueError("Invalid number range in the distance.")
+
+    # Get all used numbers in this distance range
+    used_numbers = DistanceParticipantAssociation.objects.filter(distance=distance).values_list('participant__shirt_number', flat=True)
+
+    # Generate a set of all possible numbers in the range
+    all_possible_numbers = set(range(numbers_from, numbers_to + 1))
+
+    # Find the unused numbers
+    available_numbers = all_possible_numbers - set(used_numbers)
+
+    # Return the first available number, or None if no numbers are available
+    return min(available_numbers) if available_numbers else None
 
 def export_participants_csv(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -316,39 +391,43 @@ def export_participants_csv(request, event_id):
     if search_gender:
         participants = participants.filter(gender=search_gender)
 
-    # Create CSV response
+    # Create CSV response with UTF-8 encoding to handle Lithuanian characters
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="participants_{event.name}.csv"'
 
-    # Writing the CSV data with proper UTF-8 encoding
-    writer = csv.writer(response, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    # Adding BOM to ensure proper encoding in Excel
+    response.write("\ufeff")  # BOM for UTF-8
 
-    # Writing the header row
-    writer.writerow([
+    # Create CSV writer with semicolon delimiter
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    # Write the header row
+    writer.writerow([smart_str(header) for header in [
         'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'El.paštas',
         'Valstybė', 'Miestas', 'Klubas', 'Registracijos data', 'Nr. išduotas?',
-        'Marškinėliai priskirti', 'Dydis', 'Komentaras', 'Mokestis', 'Ar sumokėjęs', 'Telefonas'
-    ])
+        'Marškinėliai priskirti', 'Dydis', 'Komentaras', 'Mokestis', 'Telefonas', 'Ar sumokėjęs'
+    ]])
 
-    # Writing participant data
+    # Write participant data
     for participant in participants:
-        writer.writerow([
-            participant.id,
-            participant.first_name,
-            participant.last_name,
+        writer.writerow([smart_str(value) for value in [
+            participant.shirt_number or "N/A",
+            participant.first_name or "N/A",
+            participant.last_name or "N/A",
             participant.date_of_birth.strftime('%Y-%m-%d') if participant.date_of_birth else "N/A",
-            participant.gender,
-            participant.email,
-            participant.country,
-            participant.city,
-            participant.club,
+            participant.gender or "N/A",
+            participant.email or "N/A",
+            participant.country or "N/A",
+            participant.city or "N/A",
+            participant.club or "N/A",
             participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
             'Taip' if participant.if_number_received else 'Ne',
             'Taip' if participant.if_shirt_received else 'Ne',
-            participant.shirt_size,
-            participant.comment,
+            participant.shirt_size or "N/A",
+            participant.comment or "N/A",
             'Taip' if participant.if_paid else 'Ne',
-            participant.phone_number
-        ])
+            participant.phone_number or "N/A",  # This is now in the correct column
+            'Taip' if participant.if_paid else 'Ne'  # Correct column for "Ar sumokėjęs"
+        ]])
 
     return response

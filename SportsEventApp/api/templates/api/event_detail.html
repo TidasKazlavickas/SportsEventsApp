@@ -86,7 +86,8 @@
     <input type="submit" value="Filtruoti">
 </form>
 
-<!-- Display event details here -->
+<!-- Edit Event Button -->
+<a href="{% url 'edit_event' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti renginį</a>
 
 <!-- Add Participant Button -->
 <a href="{% url 'add_participant' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pridėti dalyvį</a>
@@ -132,7 +133,7 @@
                     <!-- Delete Button -->
                     <a href="{% url 'delete_participant' participant.id %}" style="background-color: #f44336; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
                 </td>
-                <td>{{ forloop.counter }}</td>
+                <td>{{ participant.shirt_number }}</td>
                 <td>{{ participant.first_name }}</td>
                 <td>{{ participant.last_name }}</td>
                 <td>{{ participant.date_of_birth|date:"Y-m-d" }}</td>

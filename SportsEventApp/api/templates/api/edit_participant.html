@@ -9,50 +9,76 @@
 
 <form method="post">
     {% csrf_token %}
-    <label for="first_name">Vardas</label>
-    <input type="text" id="first_name" name="first_name" value="{{ participant.first_name }}">
-
-    <label for="last_name">Pavardė</label>
-    <input type="text" id="last_name" name="last_name" value="{{ participant.last_name }}">
-
-    <label for="date_of_birth">Gimimo data</label>
-    <input type="date" id="date_of_birth" name="date_of_birth" value="{{ participant.date_of_birth|date:'Y-m-d' }}">
-
-    <label for="gender">Lytis</label>
-    <select id="gender" name="gender">
-        <option value="Male" {% if participant.gender == 'Male' %}selected{% endif %}>Male</option>
-        <option value="Female" {% if participant.gender == 'Female' %}selected{% endif %}>Female</option>
-        <option value="Other" {% if participant.gender == 'Other' %}selected{% endif %}>Other</option>
-    </select>
-
-    <label for="email">El. paštas</label>
-    <input type="email" id="email" name="email" value="{{ participant.email }}">
-
-    <label for="country">Valstybė</label>
-    <input type="text" id="country" name="country" value="{{ participant.country }}">
-
-    <label for="city">Miestas</label>
-    <input type="text" id="city" name="city" value="{{ participant.city }}">
-
-    <label for="club">Klubas</label>
-    <input type="text" id="club" name="club" value="{{ participant.club }}">
-
-    <label for="shirt_size">Marškinėliai dydis</label>
-    <input type="text" id="shirt_size" name="shirt_size" value="{{ participant.shirt_size }}">
-
-    <label for="phone_number">Telefonas</label>
-    <input type="text" id="phone_number" name="phone_number" value="{{ participant.phone_number }}">
-
-    <label for="comment">Komentaras</label>
-    <textarea id="comment" name="comment">{{ participant.comment }}</textarea>
+    <table>
+        <tr>
+            <td><label for="{{ form.first_name.id_for_label }}">Vardas</label></td>
+            <td>{{ form.first_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.last_name.id_for_label }}">Pavardė</label></td>
+            <td>{{ form.last_name }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.date_of_birth.id_for_label }}">Gimimo data</label></td>
+            <td>{{ form.date_of_birth }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.gender.id_for_label }}">Lytis</label></td>
+            <td>{{ form.gender }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.email.id_for_label }}">El. paštas</label></td>
+            <td>{{ form.email }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.country.id_for_label }}">Valstybė</label></td>
+            <td>{{ form.country }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.city.id_for_label }}">Miestas</label></td>
+            <td>{{ form.city }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.club.id_for_label }}">Klubas</label></td>
+            <td>{{ form.club }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.shirt_size.id_for_label }}">Marškinėlių dydis</label></td>
+            <td>{{ form.shirt_size }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.phone_number.id_for_label }}">Telefonas</label></td>
+            <td>{{ form.phone_number }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.comment.id_for_label }}">Komentaras</label></td>
+            <td>{{ form.comment }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_paid.id_for_label }}">Sumokėjęs</label></td>
+            <td>{{ form.if_paid }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_number_received.id_for_label }}">Nr. Išduotas</label></td>
+            <td>{{ form.if_number_received }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.if_shirt_received.id_for_label }}">Marškiniai išduoti</label></td>
+            <td>{{ form.if_shirt_received }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.shirt_number.id_for_label }}">Numeris</label></td>
+            <td>{{ form.shirt_number }}</td>
+        </tr>
+        <tr>
+            <td><label for="{{ form.distance.id_for_label }}">Distancija</label></td>
+            <td>{{ form.distance }}</td>
+        </tr>
+    </table>
 
     <button type="submit">Išsaugoti pakeitimus</button>
 </form>
-{% for event in participant.events.all %}
-    {% if forloop.first %}
-        <a href="{% url 'event_detail' event_id=event.id %}">Atšaukti ir grįžti</a>
-    {% endif %}
-{% endfor %}
 
+<a href="{% url 'event_detail' event_id=event.id %}">Grįžti į renginio detales</a>
 </body>
 </html>
