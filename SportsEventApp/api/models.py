@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 
 class Group(models.Model):
@@ -32,7 +34,7 @@ class Event(models.Model):
 class Distance(models.Model):
     name_lt = models.CharField(db_column='Name_LT', max_length=255)
     name_en = models.CharField(db_column='Name_EN', max_length=255)
-    numbers = models.JSONField(db_column='Numbers', max_length=255)
+    numbers = models.CharField(db_column='Numbers', max_length=255)
     special_numbers = models.CharField(db_column='Special_numbers', max_length=255)
     price = models.CharField(db_column='Price', max_length=255)
     price_extra = models.CharField(db_column='Price_extra', max_length=255)
@@ -40,6 +42,7 @@ class Distance(models.Model):
     if_race = models.BooleanField(db_column='If_race')
     race_participant_count = models.IntegerField(db_column='Race_participant_count')
 
+    groups = models.ManyToManyField(Group, through='DistanceGroupAssociation')
     class Meta:
         db_table = 'Distance'
 
@@ -86,6 +89,21 @@ class Participant(models.Model):
     class Meta:
         db_table = 'participant'
 
+    def calculate_payment(self):
+            today = date.today()
+            distance = self.distances.first()
+            price = float(distance.price)  # Assuming price is stored as a string
+            price_extra = float(distance.price_extra)
+            price_extra_date = distance.price_extra_date
+
+            # If the current date is after the price_extra_date, add the extra price
+            if today >= price_extra_date:
+                price = price_extra
+
+            total_payment = price
+
+            return total_payment
+
 
 class EventParticipantAssociation(models.Model):
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="event_participations", db_column='Participant_Id')
@@ -101,3 +119,17 @@ class DistanceParticipantAssociation(models.Model):
 
     class Meta:
         db_table = 'distance_participant_association'
+
+class DistanceGroupAssociation(models.Model):
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE, related_name="group_distances", db_column='Distance_Id')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_associations', db_column='Group_Id')
+
+    class Meta:
+        db_table = 'distance_group_association'
+
+class GroupParticipantAssociation(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='participant_groups', db_column="Group_Id")
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='participant_associations', db_column='Participant_Id')
+
+    class Meta:
+        db_table = 'group_participant_association'

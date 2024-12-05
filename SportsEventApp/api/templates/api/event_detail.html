@@ -147,7 +147,7 @@
                 <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.shirt_size }}</td>
                 <td>{{ participant.comment }}</td>
-                <td>{{ participant.payment_amount|default:"-" }}</td>
+                <td>{{ participant.calculate_payment}}</td>
                 <td>{{ participant.if_paid|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.phone_number }}</td>
             </tr>

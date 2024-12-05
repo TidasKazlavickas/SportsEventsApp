@@ -1,5 +1,8 @@
+import json
+
 from django import forms
-from .models import Participant, Event, Distance, EventDistanceAssociation
+from .models import Participant, Event, Distance, EventDistanceAssociation, Group, DistanceGroupAssociation
+
 
 class EventForm(forms.Form):
     event_name = forms.CharField(required=False, max_length=200, label='Bėgimo pavadinimas', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite bėgimo pavadinimą'}))
@@ -49,6 +52,33 @@ class DistanceForm(forms.Form):
     extra_price_date = forms.DateField(required=False, label="Data nuo")
     if_race = forms.BooleanField(required=False, label='Estafetė?')
     race_participant_count = forms.IntegerField(required=False, label='Dalyvių skaičius')
+    groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all(),widget=forms.SelectMultiple(attrs={'size': 10}),required=False,label='Groups')
+
+def save(self):
+    # Save the Distance instance
+    distance_data = self.cleaned_data
+    distance = Distance.objects.create(
+        name_lt=distance_data['name_lt'],
+        name_en=distance_data['name_en'],
+        numbers=json.dumps({
+            'from': distance_data['numbers_from'],
+            'to': distance_data['numbers_to'],
+            'extra_from': distance_data['extra_numbers_from'],
+            'extra_to': distance_data['extra_numbers_to']
+        }),
+        special_numbers="",
+        price=distance_data['price'],
+        price_extra=distance_data['extra_price'],
+        price_extra_date=distance_data['extra_price_date'],
+        if_race=distance_data['if_race'],
+        race_participant_count=distance_data['race_participant_count'],
+    )
+
+    # Create associations between the selected groups and the newly created distance
+    for group in distance_data['groups']:
+        DistanceGroupAssociation.objects.create(distance=distance, group=group)
+    return distance
+
 
 class ParticipantRegistrationForm(forms.ModelForm):
     gender_choices = [

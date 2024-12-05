@@ -7,7 +7,7 @@ from django.utils.encoding import smart_str
 
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
 from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation, \
-    DistanceParticipantAssociation
+    DistanceParticipantAssociation, DistanceGroupAssociation, GroupParticipantAssociation
 import json
 
 def event_list(request):
@@ -84,7 +84,7 @@ def create_event(request):
             participant_group.save()
             return redirect('create_event')  # Redirect to refresh the page
         elif 'submit_distance' in request.POST and distance_form.is_valid():
-            # Serialize data to JSON
+            # Combine numbers_from and numbers_to into dictionaries
             numbers_data = json.dumps({
                 'numbers_from': distance_form.cleaned_data['numbers_from'],
                 'numbers_to': distance_form.cleaned_data['numbers_to']
@@ -93,14 +93,16 @@ def create_event(request):
                 'special_numbers_from': distance_form.cleaned_data['extra_numbers_from'],
                 'special_numbers_to': distance_form.cleaned_data['extra_numbers_to']
             })
+
+
             participant_count = None if not distance_form.cleaned_data['if_race'] else distance_form.cleaned_data['race_participant_count']
 
             # Create and save the Distance object
             distance = Distance(
                 name_lt=distance_form.cleaned_data['name_lt'],
                 name_en=distance_form.cleaned_data['name_en'],
-                numbers=numbers_data,
-                special_numbers=special_numbers_data,
+                numbers=numbers_data,  # Store JSON string
+                special_numbers=special_numbers_data,  # Store JSON string
                 price=distance_form.cleaned_data['price'],
                 price_extra=distance_form.cleaned_data['extra_price'],
                 price_extra_date=distance_form.cleaned_data['extra_price_date'],
@@ -109,10 +111,17 @@ def create_event(request):
             )
             distance.save()
 
+            # Now, create associations for each selected group
+            selected_groups = distance_form.cleaned_data['groups']  # Retrieve the selected groups
+
+            for group in selected_groups:
+                DistanceGroupAssociation.objects.create(distance=distance, group=group)
+
             # Create and save the association with the selected event
             selected_event = distance_form.cleaned_data['event']
             association = EventDistanceAssociation(event=selected_event, distance=distance)
             association.save()
+
 
             return redirect('create_event')  # Redirect to refresh the page
     else:
@@ -256,9 +265,9 @@ def edit_participant(request, participant_id):
     selected_distance = distance_association.distance if distance_association else None
 
     if request.method == 'POST':
-        form = ParticipantForm(request.POST, event=event)
+        form = ParticipantForm(request.POST, event=event, instance=participant)  # Pass the existing participant instance here
         if form.is_valid():
-            participant = form.save()
+            participant = form.save()  # Save the form, which updates the participant object
 
             # Ensure the event-participant association is created
             if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
@@ -275,8 +284,7 @@ def edit_participant(request, participant_id):
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
-            if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
-                # Get the next available number from the pool (assuming you have a function to fetch the next number)
+            if request.POST.get('if_paid') == 'on' and not participant.shirt_number:
                 next_available_number = get_next_available_number(selected_distance)
 
                 # Only assign if a valid number is available
@@ -323,6 +331,11 @@ def add_participant(request, event_id):
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
+            # Assign participant to the correct group based on age and gender
+            closest_group = assign_group_to_participant(participant, selected_distance)
+            if closest_group:
+                add_participant_to_group(participant, closest_group)
+
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
             if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
                 # Get the next available number from the pool (assuming you have a function to fetch the next number)
@@ -333,7 +346,8 @@ def add_participant(request, event_id):
                     participant.shirt_number = next_available_number
                     participant.save()
 
-            return redirect('event_detail', event_id=event_id)
+            # return redirect('event_detail', event_id=event_id)
+            return render(request, 'api/add_participant.html', {'event': event, 'form': form})
 
     else:
         form = ParticipantForm(event=event)
@@ -341,9 +355,13 @@ def add_participant(request, event_id):
     return render(request, 'api/add_participant.html', {'event': event, 'form': form})
 
 def get_next_available_number(distance):
-    # Directly access the 'numbers' field, which is already a dictionary
-    number_range = distance.numbers  # Assuming 'numbers' is already a dictionary
+    # Assuming 'distance.numbers' is a string containing JSON-like data
+    numbers_str = distance.numbers  # The string, e.g., '{"numbers_from": 100, "numbers_to": 999}'
 
+    # Parse the string into a dictionary
+    number_range = json.loads(numbers_str)
+
+    # Now you can safely access the fields
     numbers_from = number_range.get("numbers_from")
     numbers_to = number_range.get("numbers_to")
 
@@ -431,3 +449,49 @@ def export_participants_csv(request, event_id):
         ]])
 
     return response
+
+def calculate_age(birth_date, debug_messages=None):
+    today = date.today()
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+    # Add debug message about the age calculation
+    if debug_messages is not None:
+        debug_messages.append(f"Calculated age for birth date {birth_date}: {age}")
+
+    return age
+
+def assign_group_to_participant(participant, selected_distance, debug_messages):
+    # Calculate participant's age
+    age = calculate_age(participant.date_of_birth)
+    debug_messages.append(f"Participant Age: {age}")  # Add to debug messages
+
+    # Get all groups associated with the selected distance
+    groups = selected_distance.groups.all()
+    debug_messages.append(f"Groups found for distance: {groups.count()}")  # Add to debug messages
+
+    # Loop through each group and find the closest match
+    closest_group = None
+    for group in groups:
+        # Parse the age range from JSON
+        age_range = json.loads(group.age)
+        age_from = age_range.get("age_from")
+        age_to = age_range.get("age_to")
+
+        debug_messages.append(f"Checking Group: {group.name} (Age range: {age_from} - {age_to})")  # Add to debug messages
+
+        # Check if the participant's gender matches and their age falls within the group range
+        if participant.gender == group.gender and age_from <= age <= age_to:
+            closest_group = group
+            debug_messages.append(f"Group matched: {group.name}")  # Add to debug messages
+            break
+
+    return closest_group
+
+
+def add_participant_to_group(participant, group):
+    # Check if the participant is already assigned to this group
+    if not GroupParticipantAssociation.objects.filter(participant=participant, group=group).exists():
+        GroupParticipantAssociation.objects.create(participant=participant, group=group)
+
+
+
