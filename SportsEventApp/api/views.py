@@ -454,31 +454,29 @@ def export_participants_csv(request, event_id):
 
     # Write the header row
     writer.writerow([smart_str(header) for header in [
-        'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'El.paštas',
-        'Valstybė', 'Miestas', 'Klubas', 'Registracijos data', 'Nr. išduotas?',
-        'Marškinėliai priskirti', 'Dydis', 'Komentaras', 'Mokestis', 'Telefonas', 'Ar sumokėjęs'
+        'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'Grupė' ,'El.paštas',
+        'Valstybė', 'Miestas', 'Klubas', 'Distancija','Registracijos data', 'Komentaras', 'Telefonas'
     ]])
 
     # Write participant data
     for participant in participants:
+
+        participant.groups = Group.objects.filter(participant_groups__participant=participant)
         writer.writerow([smart_str(value) for value in [
             participant.shirt_number or "N/A",
             participant.first_name or "N/A",
             participant.last_name or "N/A",
             participant.date_of_birth.strftime('%Y-%m-%d') if participant.date_of_birth else "N/A",
             participant.gender or "N/A",
+            participant.groups.first().name or "N/A",
             participant.email or "N/A",
             participant.country or "N/A",
             participant.city or "N/A",
             participant.club or "N/A",
+            participant.distances.first().name_lt or "N/A",
             participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
-            'Taip' if participant.if_number_received else 'Ne',
-            'Taip' if participant.if_shirt_received else 'Ne',
-            participant.shirt_size or "N/A",
             participant.comment or "N/A",
-            'Taip' if participant.if_paid else 'Ne',
             participant.phone_number or "N/A",  # This is now in the correct column
-            'Taip' if participant.if_paid else 'Ne'  # Correct column for "Ar sumokėjęs"
         ]])
 
     return response
