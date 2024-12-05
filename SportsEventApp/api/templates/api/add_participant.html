@@ -6,18 +6,6 @@
 </head>
 <body>
 <h1>Pridėti dalyvį į renginį: {{ event.name }}</h1>
-
-{% if debug_messages %}
-    <div style="border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-        <strong>Debug Messages:</strong>
-        <ul>
-            {% for message in debug_messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-
 <!-- Participant Registration Form -->
 <form method="post">
     {% csrf_token %}

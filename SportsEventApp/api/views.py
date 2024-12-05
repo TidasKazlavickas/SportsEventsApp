@@ -307,8 +307,6 @@ def delete_participant(request, participant_id):
     participant.delete()  # Delete the participant
     return redirect('event_detail', event_id=event_id)
 
-import json
-
 def add_participant(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
@@ -331,10 +329,42 @@ def add_participant(request, event_id):
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
-            # Assign participant to the correct group based on age and gender
-            closest_group = assign_group_to_participant(participant, selected_distance)
+            # Calculate the participant's age
+            today = date.today()
+            age = today.year - participant.date_of_birth.year - ((today.month, today.day) < (participant.date_of_birth.month, participant.date_of_birth.day))
+
+            # Get all groups associated with the selected distance
+            groups = selected_distance.groups.all()
+
+            # Find all appropriate groups based on gender
+            eligible_groups = [
+                group for group in groups if group.gender.lower() == participant.gender.lower()
+            ]
+
+            # If no eligible groups found, raise an exception or handle it appropriately
+            if not eligible_groups:
+                return redirect('error_page')  # Or display an error message to the user
+
+            closest_group = None
+            smallest_age_diff = None
+
+            # Loop through the eligible groups to find the closest one based on age
+            for group in eligible_groups:
+                age_range = json.loads(group.age)  # Assuming it's stored as a JSON string
+                if age_range['age_from'] <= age <= age_range['age_to']:
+                    # Calculate the "closeness" of the group based on age range
+                    age_diff_from = age - age_range['age_from']
+                    age_diff_to = age_range['age_to'] - age
+                    smallest_age_diff_group = min(age_diff_from, age_diff_to)
+
+                    # Check if this group is closer than the previous closest
+                    if smallest_age_diff is None or smallest_age_diff_group < smallest_age_diff:
+                        smallest_age_diff = smallest_age_diff_group
+                        closest_group = group
+
+            # If a closest group was found, create the association
             if closest_group:
-                add_participant_to_group(participant, closest_group)
+                GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
 
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
             if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
@@ -346,8 +376,7 @@ def add_participant(request, event_id):
                     participant.shirt_number = next_available_number
                     participant.save()
 
-            # return redirect('event_detail', event_id=event_id)
-            return render(request, 'api/add_participant.html', {'event': event, 'form': form})
+            return redirect('event_detail', event_id=event_id)
 
     else:
         form = ParticipantForm(event=event)
@@ -449,49 +478,3 @@ def export_participants_csv(request, event_id):
         ]])
 
     return response
-
-def calculate_age(birth_date, debug_messages=None):
-    today = date.today()
-    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-
-    # Add debug message about the age calculation
-    if debug_messages is not None:
-        debug_messages.append(f"Calculated age for birth date {birth_date}: {age}")
-
-    return age
-
-def assign_group_to_participant(participant, selected_distance, debug_messages):
-    # Calculate participant's age
-    age = calculate_age(participant.date_of_birth)
-    debug_messages.append(f"Participant Age: {age}")  # Add to debug messages
-
-    # Get all groups associated with the selected distance
-    groups = selected_distance.groups.all()
-    debug_messages.append(f"Groups found for distance: {groups.count()}")  # Add to debug messages
-
-    # Loop through each group and find the closest match
-    closest_group = None
-    for group in groups:
-        # Parse the age range from JSON
-        age_range = json.loads(group.age)
-        age_from = age_range.get("age_from")
-        age_to = age_range.get("age_to")
-
-        debug_messages.append(f"Checking Group: {group.name} (Age range: {age_from} - {age_to})")  # Add to debug messages
-
-        # Check if the participant's gender matches and their age falls within the group range
-        if participant.gender == group.gender and age_from <= age <= age_to:
-            closest_group = group
-            debug_messages.append(f"Group matched: {group.name}")  # Add to debug messages
-            break
-
-    return closest_group
-
-
-def add_participant_to_group(participant, group):
-    # Check if the participant is already assigned to this group
-    if not GroupParticipantAssociation.objects.filter(participant=participant, group=group).exists():
-        GroupParticipantAssociation.objects.create(participant=participant, group=group)
-
-
-
