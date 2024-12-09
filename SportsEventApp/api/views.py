@@ -1,15 +1,16 @@
 import csv
 from datetime import date
-
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.encoding import smart_str
-
 from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
 from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation, \
     DistanceParticipantAssociation, DistanceGroupAssociation, GroupParticipantAssociation
 import json
 
+
+@login_required
 def event_list(request):
     events = Event.objects.all()  # Fetch all events
     return render(request, 'api/event_list.html', {'events': events})

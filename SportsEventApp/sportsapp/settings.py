@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'sportsapp',
+    'sslserver'
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/login/'  # Use your correct login URL pattern
+LOGIN_REDIRECT_URL = '/events/'  # Adjust to your events list or home page
+LOGOUT_REDIRECT_URL = '/login/'  # After logging out
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Security settings
+SECURE_SSL_REDIRECT = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True

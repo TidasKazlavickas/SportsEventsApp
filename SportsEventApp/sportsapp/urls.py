@@ -1,5 +1,6 @@
 from django.urls import path
 from api import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.event_list, name='event_list'),
@@ -13,4 +14,6 @@ urlpatterns = [
     path('delete-participant/<int:participant_id>/', views.delete_participant, name='delete_participant'),
     path('event/<int:event_id>/export_participants_csv/', views.export_participants_csv, name='export_participants_csv'),
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
+    path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
