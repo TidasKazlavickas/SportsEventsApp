@@ -231,6 +231,7 @@ def event_detail(request, event_id):
     # Retrieve the associated groups for each participant
     for participant in participants:
         participant.groups = Group.objects.filter(participant_groups__participant=participant)
+        participant.distance = participant.distances.first()
 
     return render(request, 'api/event_detail.html', {
         'event': event,

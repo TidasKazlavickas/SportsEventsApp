@@ -22,7 +22,8 @@ urlpatterns = [
 
     # Front-end URLs
     path('events-front/', views_frontend.event_list, name='events'),
-    path('register_participant/<int:event_id>', views_frontend.participant_register, name='register_participant')
+    path('register-participant/<int:event_id>', views_frontend.participant_register, name='register_participant'),
+    path('participant-list/<int:event_id>', views_frontend.participant_list, name='participants_front')
 ]
 
 if settings.DEBUG:

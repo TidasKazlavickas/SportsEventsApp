@@ -3,7 +3,7 @@ from datetime import date
 
 from api.forms import ParticipantForm
 from api.models import Event, Distance, DistanceParticipantAssociation, GroupParticipantAssociation, \
-    EventParticipantAssociation
+    EventParticipantAssociation, Participant
 from django.conf import settings
 import json
 from django.shortcuts import render, get_object_or_404, redirect
@@ -14,6 +14,16 @@ from api.views import get_next_available_number
 
 def event_list(request):
     events = Event.objects.all()  # Get all events from the database
+    # Retrieve search query parameters
+    search_name = request.GET.get('search_name', '')
+    search_year = request.GET.get('search_year', '')
+
+    # Apply filters
+    if search_name:
+        events = events.filter(name__icontains=search_name)
+
+    if search_year:
+        events = events.filter(event_date__year=search_year)
 
     # Replace spaces with underscores and convert to lowercase for each event
     for event in events:
@@ -124,3 +134,43 @@ def participant_register(request, event_id):
                 participant.shirt_number = next_available_number
                 participant.save()
     return render(request, 'frontend/add_participant.html', {'form': form, 'event': event})
+
+def participant_list(request, event_id):
+    # Get the event object
+    event = get_object_or_404(Event, id=event_id)
+    participants = Participant.objects.filter(events__id=event_id)
+
+    # Retrieve all distances linked to the event
+    distances = Distance.objects.filter(eventdistanceassociation__event=event)
+
+    # Filter by search query parameters
+    search_first_name = request.GET.get('search_first_name', '')
+    search_last_name = request.GET.get('search_last_name', '')
+    search_number = request.GET.get('search_number', '')
+    search_club = request.GET.get('search_club', '')
+    search_distance = request.GET.get('search_distance', '')
+
+    # Apply filters
+    if search_first_name:
+        participants = participants.filter(first_name__icontains=search_first_name)
+
+    if search_last_name:
+        participants = participants.filter(last_name__icontains=search_last_name)
+
+    if search_number:
+        participants = participants.filter(id=search_number)
+
+    if search_club:
+        participants = participants.filter(club__icontains=search_club)
+
+    if search_distance:
+        participants = participants.filter(distances__id=search_distance)
+
+    for participant in participants:
+        participant.distance = participant.distances.first()
+
+    return render(request, 'frontend/participant_list.html', {
+        'event': event,
+        'participants': participants,
+        'distances': distances
+    })

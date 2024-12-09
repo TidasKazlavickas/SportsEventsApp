@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dalyviai | Sporto Renginiai</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        input[type="text"], select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<!-- Filter/Search Form -->
+<form method="get">
+    <label for="search_first_name">Vardas:</label>
+    <input type="text" id="search_first_name" name="search_first_name" value="{{ request.GET.search_first_name }}">
+
+    <label for="search_last_name">Pavardė:</label>
+    <input type="text" id="search_last_name" name="search_last_name" value="{{ request.GET.search_last_name }}">
+
+    <label for="search_club">Klubas:</label>
+    <input type="text" id="search_club" name="search_club" value="{{ request.GET.search_club }}">
+
+    <label for="search_distance">Distancija:</label>
+    <select id="search_distance" name="search_distance">
+        <option value="">Visos</option>
+        {% for distance in distances %}
+            <option value="{{ distance.id }}" {% if request.GET.search_distance == distance.id|stringformat:"s" %}selected{% endif %}>
+                {{ distance.name_lt }}
+            </option>
+        {% endfor %}
+    </select>
+
+
+    <input type="submit" value="Ieškoti">
+</form>
+
+    <!-- Participant Table -->
+    <h2>Dalyvių lentelė</h2>
+    {% if participants %}
+        <table>
+            <thead>
+            <tr>
+                <th>Numeris</th>
+                <th>Vardas</th>
+                <th>Pavardė</th>
+                <th>Lytis</th>
+                <th>Valstybė</th>
+                <th>Miestas</th>
+                <th>Klubas</th>
+                <th>Distancija</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for participant in participants %}
+                <tr>
+                    <td>{{ participant.shirt_number }}</td>
+                    <td>{{ participant.first_name }}</td>
+                    <td>{{ participant.last_name }}</td>
+                    <td>{{ participant.gender }}</td>
+                    <td>{{ participant.country }}</td>
+                    <td>{{ participant.city }}</td>
+                    <td>{{ participant.club }}</td>
+                    <td>{{ participant.distance.name_lt }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Šiuo metu nėra užsiregistravusių dalyvių.</p>
+    {% endif %}
+
+<a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
+</body>
+</html>

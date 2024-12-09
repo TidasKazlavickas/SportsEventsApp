@@ -108,11 +108,12 @@
             <th>Pavardė</th>
             <th>Gimimo data</th>
             <th>Lytis</th>
+            <th>Grupė</th>
             <th>El.paštas</th>
             <th>Valstybė</th>
             <th>Miestas</th>
             <th>Klubas</th>
-            <th>Grupė</th>
+            <th>Distancija</th>
             <th>Registracijos data</th>
             <th>Nr. išduotas?</th>
             <th>Marškinėliai priskirti</th>
@@ -138,10 +139,6 @@
                 <td>{{ participant.last_name }}</td>
                 <td>{{ participant.date_of_birth|date:"Y-m-d" }}</td>
                 <td>{{ participant.gender }}</td>
-                <td>{{ participant.email }}</td>
-                <td>{{ participant.country }}</td>
-                <td>{{ participant.city }}</td>
-                <td>{{ participant.club }}</td>
                 <td style="text-align: center;">
                     {% if participant.groups %}
                         <ul style="list-style-type: none; padding: 0; text-align: center;">
@@ -153,6 +150,11 @@
                         No group assigned
                     {% endif %}
                 </td>
+                <td>{{ participant.email }}</td>
+                <td>{{ participant.country }}</td>
+                <td>{{ participant.city }}</td>
+                <td>{{ participant.club }}</td>
+                <td>{{ participant.distance.name_lt }}</td>
                 <td>{{ participant.registration_date|date:"Y-m-d" }}</td>
                 <td>{{ participant.if_number_received|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.if_shirt_received|yesno:"Taip,Ne" }}</td>

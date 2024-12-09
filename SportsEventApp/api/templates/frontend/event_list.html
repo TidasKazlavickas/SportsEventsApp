@@ -7,6 +7,16 @@
         <title>Renginiai | Sporto Renginiai</title>
 </head>
 <body>
+<form method="get">
+    <h1>Renginių paieška</h1>
+    <label for="search_first_name">Pavadinimas:</label>
+    <input type="text" id="search_name" name="search_name" value="{{ request.GET.search_name }}">
+
+    <label for="search_last_name">Metai:</label>
+    <input type="text" id="search_year" name="search_year" value="{{ request.GET.search_year}}">
+
+    <input type="submit" value="Ieškoti">
+</form>
 {% block content %}
     <h1>Visi renginiai</h1>
 
@@ -17,6 +27,7 @@
                 <p class="event-name" style="width: 300px;"> {{ event.name }}</p>
                 <p class="event-name" style="width: 300px; color:orangered;"> {{ event.event_date }}</p>
                 <a href="{% url 'register_participant' event.id %}">Registruotis</a>
+                <a href="{% url 'participants_front' event.id %}">Dalyviai</a>
             </div>
             {% empty %}
             <p>No events available.</p>
