@@ -19,6 +19,7 @@ urlpatterns = [
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
     path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('event/<int:event_id>/add_results/', views.add_event_results, name='add_event_results'),
 
     # Front-end URLs
     path('events-front/', views_frontend.event_list, name='events'),

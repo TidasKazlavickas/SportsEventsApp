@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pridėti renginio rezultatus - {{ event.name }}</title>
+</head>
+<body>
+<h1>Pridėti renginio rezultatus: {{ event.name }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="results_link">Rezultatų nuoroda:</label>
+    <input type="url" id="results_link" name="results_link" value="{{ event.result_link }}" required>
+    <input type="submit" value="Išsaugoti">
+</form>
+
+<a href="{% url 'event_detail' event_id=event.id %}">Grįžti į renginį</a>
+
+</body>
+</html>

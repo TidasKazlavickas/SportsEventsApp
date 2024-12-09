@@ -3,6 +3,7 @@ import os
 from datetime import date
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse, HttpResponse
@@ -500,3 +501,18 @@ def export_participants_csv(request, event_id):
         ]])
 
     return response
+
+def add_event_results(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        results_link = request.POST.get('results_link')
+        if results_link:
+            event.result_link = results_link  # Corrected field
+            event.save()
+            messages.success(request, "Renginio rezultatai sėkmingai pridėti.")
+            return redirect('event_detail', event_id=event_id)
+        else:
+            messages.error(request, "Prašome įvesti rezultatų nuorodą.")
+
+    return render(request, 'api/add_event_results.html', {'event': event})

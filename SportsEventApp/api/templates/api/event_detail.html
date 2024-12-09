@@ -96,6 +96,12 @@
     <input type="submit" value="Eksportuoti į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 </form>
 
+<!-- Add Event Results Button -->
+<a href="{% url 'add_event_results' event_id=event.id %}"
+   style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+    Pridėti renginio rezultatus
+</a>
+
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>
 {% if participants %}

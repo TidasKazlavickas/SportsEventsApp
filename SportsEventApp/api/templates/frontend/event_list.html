@@ -28,6 +28,10 @@
                 <p class="event-name" style="width: 300px; color:orangered;"> {{ event.event_date }}</p>
                 <a href="{% url 'register_participant' event.id %}">Registruotis</a>
                 <a href="{% url 'participants_front' event.id %}">Dalyviai</a>
+                <!-- Results Button (if link exists) -->
+                {% if event.result_link %}
+                    <a href="{{ event.result_link }}" target="_blank">Rezultatai</a>
+                {% endif %}
             </div>
             {% empty %}
             <p>No events available.</p>
