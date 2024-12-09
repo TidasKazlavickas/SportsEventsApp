@@ -33,6 +33,9 @@
     <label for="registration_deadline">Registracijos pabaigos data:</label>
     <input type="date" id="registration_deadline" name="registration_deadline" value="{{ event.registration_deadline|date:'Y-m-d' }}"><br><br>
 
+    <label for="registration_deadline">Renginio data:</label>
+    <input type="date" id="event_date" name="event_date" value="{{ event.event_date|date:'Y-m-d' }}"><br><br>
+
     <label for="payment_project_id">Mokėjimo projektas ID:</label>
     <input type="text" id="payment_project_id" name="payment_project_id" value="{{ event.payment_project_id }}"><br><br>
 

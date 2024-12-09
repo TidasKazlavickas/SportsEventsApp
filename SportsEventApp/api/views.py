@@ -34,6 +34,7 @@ def create_event(request):
             reglament_lt = event_form.cleaned_data['reglament_lt']
             reglament_en = event_form.cleaned_data['reglament_en']
             registration_deadline = event_form.cleaned_data['registration_deadline']
+            event_date = event_form.cleaned_data['event_date']
             payment_project_id = event_form.cleaned_data['payment_project_id']
             payment_password = event_form.cleaned_data['payment_password']
             event_result_link = event_form.cleaned_data['event_result_link']
@@ -70,6 +71,7 @@ def create_event(request):
                 reglament_lt=reglament_lt,
                 reglament_en=reglament_en,
                 registration_deadline=registration_deadline,
+                event_date=event_date,
                 payment_project_id=payment_project_id,
                 payment_password=payment_password,
                 event_result_link=event_result_link,
@@ -249,6 +251,7 @@ def edit_event(request, event_id):
         reglament_lt = request.POST.get('reglament_lt')
         reglament_en = request.POST.get('reglament_en')
         registration_deadline = request.POST.get('registration_deadline')
+        event_date = request.POST.get('event_date')
         payment_project_id = request.POST.get('payment_project_id')
         payment_password = request.POST.get('payment_password')
         event_result_link = request.POST.get('event_result_link')
@@ -259,6 +262,7 @@ def edit_event(request, event_id):
         event.reglament_lt = reglament_lt
         event.reglament_en = reglament_en
         event.registration_deadline = registration_deadline if registration_deadline else None
+        event.event_date = event_date if event_date else None
         event.payment_project_id = payment_project_id
         event.payment_password = payment_password
         event.event_result_link = event_result_link

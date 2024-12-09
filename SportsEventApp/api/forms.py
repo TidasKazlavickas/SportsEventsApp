@@ -20,7 +20,7 @@ class EventForm(forms.Form):
     is_phone_required = forms.BooleanField(required=False, label='Telefonas')
     is_sportident_required = forms.BooleanField(required=False, label='Sportident')
     registration_deadline = forms.DateField(required=False,label='Registracijos pabaigos data',widget=forms.DateInput(attrs={'type': 'date'}))
-
+    event_date = forms.DateField(required=False, label='Renginio data',widget=forms.DateInput(attrs={'type': 'date'}))
     reglament_lt = forms.CharField(required=False, max_length=500, label='Reglamentas LT', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą LT'}))
     reglament_en = forms.CharField(required=False, max_length=500, label='Reglamentas EN', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite reglamento nuorodą EN'}))
 
@@ -205,17 +205,7 @@ class ParticipantForm(forms.ModelForm):
             )
 
 
-    def clean_phone_number(self):
-        phone_number = self.cleaned_data.get('phone_number')
-        if not phone_number.isdigit():
-            raise forms.ValidationError("Phone number must contain only digits.")
-        return phone_number
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not email:
-            raise forms.ValidationError("Email is required.")
-        return email
+    #
 
     def clean_shirt_number(self):
         shirt_number = self.cleaned_data.get('shirt_number')

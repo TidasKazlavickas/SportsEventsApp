@@ -22,6 +22,7 @@ class Event(models.Model):
     payment_project_id = models.CharField(db_column='Payment_project_id', max_length=255, blank=True, null=True)
     payment_password = models.CharField(db_column='Payment_password', max_length=255, blank=True, null=True)
     event_result_link = models.CharField(db_column='Event_result_link', max_length=500, blank=True, null=True)
+    event_date = models.DateField(db_column='Event_date', null=True, blank=True)
     class Meta:
         db_table = 'sports_event'
 

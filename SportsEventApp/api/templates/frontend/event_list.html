@@ -15,6 +15,7 @@
             <div class="event-item">
                 <img src="{{ event.logo_path }}" alt="Event Logo" style="width: 300px; height: 200px;">
                 <p class="event-name" style="width: 300px;"> {{ event.name }} </p>
+                <a href="{% url 'register_participant' event.id %}">Registruotis</a>
             </div>
             {% empty %}
             <p>No events available.</p>

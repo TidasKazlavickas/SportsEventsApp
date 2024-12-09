@@ -21,7 +21,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     # Front-end URLs
-    path('events-front/', views_frontend.event_list, name='events')
+    path('events-front/', views_frontend.event_list, name='events'),
+    path('register_participant/<int:event_id>', views_frontend.participant_register, name='register_participant')
 ]
 
 if settings.DEBUG:
