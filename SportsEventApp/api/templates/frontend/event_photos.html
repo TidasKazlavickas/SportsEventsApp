@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuotraukos | {{ event.name }}</title>
+    <style>
+        /* Style for the photos gallery */
+        .photos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .photo-item img {
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .photo-item img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Lightbox overlay */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 5px solid white;
+        }
+
+        .lightbox:target {
+            display: flex;
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Nuotraukos - {{ event.name }}</h1>
+
+{% if photo_urls %}
+    <div class="photos-container">
+        {% for photo_url in photo_urls %}
+            <div class="photo-item">
+                <a href="#lightbox{{ forloop.counter }}">
+                    <img src="{{ photo_url }}" alt="Event Photo">
+                </a>
+                <div id="lightbox{{ forloop.counter }}" class="lightbox">
+                    <a href="#" class="close-btn">&times;</a>
+                    <img src="{{ photo_url }}" alt="Event Photo">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Šiam renginiui nuotraukos nepateiktos.</p>
+{% endif %}
+
+<a href="{% url 'event_list' %}">Atgal į renginius</a>
+</body>
+</html>
+

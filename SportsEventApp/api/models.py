@@ -1,5 +1,5 @@
 from datetime import date
-
+from django.utils import timezone
 from django.db import models
 
 class Group(models.Model):
@@ -133,3 +133,11 @@ class GroupParticipantAssociation(models.Model):
 
     class Meta:
         db_table = 'group_participant_association'
+
+class EventPhoto(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='photos')
+    photo = models.ImageField(upload_to='event_photos/%Y/%m/%d/')
+    uploaded_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Photo for {self.event.name}"

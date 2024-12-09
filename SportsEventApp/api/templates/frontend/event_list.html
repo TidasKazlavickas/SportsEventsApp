@@ -32,6 +32,7 @@
                 {% if event.result_link %}
                     <a href="{{ event.result_link }}" target="_blank">Rezultatai</a>
                 {% endif %}
+                <a href="{% url 'event_photos' event.id %}">Nuotraukos</a>
             </div>
             {% empty %}
             <p>No events available.</p>

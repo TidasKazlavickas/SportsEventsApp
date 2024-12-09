@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pridėti renginio nuotraukas</title>
+</head>
+<body>
+<h1>Pridėti nuotraukas renginiui: {{ event.name }}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="photos">Pasirinkite nuotraukas:</label>
+    <input type="file" name="photos" multiple> <!-- 'multiple' allows multiple files -->
+    <button type="submit">Įkelti nuotraukas</button>
+</form>
+
+<a href="{% url 'event_detail' event.id %}">Atgal į renginio detales</a>
+</body>
+</html>

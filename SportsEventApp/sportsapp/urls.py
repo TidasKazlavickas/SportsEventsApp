@@ -20,11 +20,14 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('event/<int:event_id>/add_results/', views.add_event_results, name='add_event_results'),
+    path('event/<int:event_id>/upload_photos/', views.upload_event_photos, name='upload_event_photos'),
+
 
     # Front-end URLs
     path('events-front/', views_frontend.event_list, name='events'),
     path('register-participant/<int:event_id>', views_frontend.participant_register, name='register_participant'),
-    path('participant-list/<int:event_id>', views_frontend.participant_list, name='participants_front')
+    path('participant-list/<int:event_id>', views_frontend.participant_list, name='participants_front'),
+    path('event/<int:event_id>/photos/', views_frontend.event_photos, name='event_photos'),
 ]
 
 if settings.DEBUG:

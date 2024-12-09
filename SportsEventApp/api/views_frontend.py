@@ -174,3 +174,21 @@ def participant_list(request, event_id):
         'participants': participants,
         'distances': distances
     })
+
+def event_photos(request, event_id):
+    # Get the event object
+    event = get_object_or_404(Event, id=event_id)
+
+    # Define the path where the event's photos are stored
+    event_folder = os.path.join(settings.MEDIA_ROOT, 'event_photos', event.name)
+
+    # Check if the folder exists and retrieve all image files
+    if os.path.exists(event_folder):
+        photo_files = [f for f in os.listdir(event_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    else:
+        photo_files = []
+
+    # Construct the URLs for the photos
+    photo_urls = [os.path.join(settings.MEDIA_URL, 'event_photos', event.name, photo) for photo in photo_files]
+
+    return render(request, 'frontend/event_photos.html', {'event': event, 'photo_urls': photo_urls})

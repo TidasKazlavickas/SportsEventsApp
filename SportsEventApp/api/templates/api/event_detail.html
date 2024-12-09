@@ -102,6 +102,10 @@
     Pridėti renginio rezultatus
 </a>
 
+<a href="{% url 'upload_event_photos' event.id %}">
+    <button>Pridėti renginio nuotraukas</button>
+</a>
+
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>
 {% if participants %}

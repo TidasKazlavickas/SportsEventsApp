@@ -516,3 +516,28 @@ def add_event_results(request, event_id):
             messages.error(request, "Prašome įvesti rezultatų nuorodą.")
 
     return render(request, 'api/add_event_results.html', {'event': event})
+
+
+def upload_event_photos(request, event_id):
+    # Get the event object
+    event = get_object_or_404(Event, id=event_id)
+
+    # Directory path based on event name (in the media folder)
+    event_folder = os.path.join(settings.MEDIA_ROOT, 'event_photos', event.name)
+
+    # If the directory doesn't exist, create it
+    if not os.path.exists(event_folder):
+        os.makedirs(event_folder)
+
+    # Handling the file upload
+    if request.method == 'POST' and request.FILES.getlist('photos'):
+        # Loop through the files uploaded and save them
+        for photo in request.FILES.getlist('photos'):
+            # Create the file path to save it locally in the event folder
+            fs = FileSystemStorage(location=event_folder)
+            filename = fs.save(photo.name, photo)
+            file_url = fs.url(filename)  # You can ignore the file_url if not storing in the DB
+
+        return redirect('event_detail', event_id=event_id)  # Redirect to event detail page
+
+    return render(request, 'api/upload_event_photos.html', {'event': event})
