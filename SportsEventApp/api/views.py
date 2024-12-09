@@ -1,6 +1,10 @@
 import csv
+import os
 from datetime import date
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.encoding import smart_str
@@ -17,7 +21,7 @@ def event_list(request):
 
 def create_event(request):
     if request.method == 'POST':
-        event_form = EventForm(request.POST)
+        event_form = EventForm(request.POST, request.FILES)
         group_form = GroupForm(request.POST)
         distance_form = DistanceForm(request.POST)
 
@@ -25,6 +29,7 @@ def create_event(request):
 
             # Extract the cleaned data
             event_name = event_form.cleaned_data['event_name']
+            event_logo = event_form.cleaned_data['event_logo']
             required_participant_fields = event_form.cleaned_data['required_participant_fields']
             reglament_lt = event_form.cleaned_data['reglament_lt']
             reglament_en = event_form.cleaned_data['reglament_en']
@@ -45,6 +50,15 @@ def create_event(request):
                 'Telefonas': event_form.cleaned_data.get('is_phone_required', False),
                 'Sportident': event_form.cleaned_data.get('is_sportident_required', False),
             }
+
+            # Save the logo if it's provided
+            if event_logo:
+                event_id = event_name.replace(" ", "_").lower()  # You can use event_name or generate the ID as needed
+                event_logo_path = os.path.join(settings.MEDIA_ROOT, str(event_id) + '.jpg')  # Save the logo with the event ID
+
+                # Save the file
+                fs = FileSystemStorage()
+                fs.save(event_logo_path, event_logo)
 
             # Creating a string that looks like JSON, but is a plain string
             # Example: '{"Vardas": true, "Pavardė": false, "Gimimo metai": true}'

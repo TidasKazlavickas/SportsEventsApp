@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
+<head>
+    <meta charset="UTF-8">
+        <title>Renginiai | Sporto Renginiai</title>
+</head>
+<body>
+{% block content %}
+    <h1>Visi renginiai</h1>
+
+    <div class="event-container">
+        {% for event in events %}
+            <div class="event-item">
+                <img src="{{ event.logo_path }}" alt="Event Logo" style="width: 300px; height: 200px;">
+                <p class="event-name" style="width: 300px;"> {{ event.name }} </p>
+            </div>
+            {% empty %}
+            <p>No events available.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+</body>
+</html>

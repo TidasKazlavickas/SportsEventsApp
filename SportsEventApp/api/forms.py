@@ -27,6 +27,7 @@ class EventForm(forms.Form):
     payment_project_id = forms.CharField(required=False, max_length=255, label='Payment Project ID', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite mokėjimo projekto ID'}))
     payment_password = forms.CharField(required=False, max_length=255, label='Payment Password', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite mokėjimo slaptažodi'}))
     event_result_link = forms.CharField(required=False, max_length=500, label='Event Result Link', widget=forms.TextInput(attrs={'placeholder': 'Įrašykite renginio nuoroda rodoma rezultatuose'}))
+    event_logo = forms.ImageField(required=False, label='Įkelti renginio logotipą')
 
 class GroupForm(forms.Form):
     name = forms.CharField(required=False, max_length=100, label='Pavadinimas')

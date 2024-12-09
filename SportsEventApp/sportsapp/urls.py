@@ -1,8 +1,11 @@
 from django.urls import path
-from api import views
+from api import views, views_frontend
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
+    # Back-end URLs
     path('', views.event_list, name='event_list'),
     path('create-event/', views.create_event, name='create_event'),
     path('events/<int:event_id>/', views.event_detail, name='event_detail'),
@@ -16,4 +19,10 @@ urlpatterns = [
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
     path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
+    # Front-end URLs
+    path('events-front/', views_frontend.event_list, name='events')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
