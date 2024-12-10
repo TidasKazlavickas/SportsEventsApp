@@ -37,9 +37,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'in-v3.mailjet.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '3fe5161a0b862a3d29d7bbd83385a18b'  # Replace with your Mailjet public API key
-EMAIL_HOST_PASSWORD = '37450bca1fb9bb4001b2f8d5ccc6bdce'  # Replace with your Mailjet secret API key
-DEFAULT_FROM_EMAIL = 'sportorenginiailt@gmail.com'  # Replace with your verified sender email
+EMAIL_HOST_USER = '3fe5161a0b862a3d29d7bbd83385a18b'
+EMAIL_HOST_PASSWORD = '37450bca1fb9bb4001b2f8d5ccc6bdce'
+DEFAULT_FROM_EMAIL = 'sportorenginiailt@gmail.com'
 
 
 # Application definition
@@ -146,9 +146,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/login/'  # Use your correct login URL pattern
-LOGIN_REDIRECT_URL = '/events/'  # Adjust to your events list or home page
-LOGOUT_REDIRECT_URL = '/login/'  # After logging out
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/events/'
+LOGOUT_REDIRECT_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Security settings

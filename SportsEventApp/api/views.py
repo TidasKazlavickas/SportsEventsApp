@@ -9,7 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.encoding import smart_str
-from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm, EmailForm
+from .forms import EventForm, GroupForm, DistanceForm, ParticipantForm, EmailForm
 from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation, \
     DistanceParticipantAssociation, DistanceGroupAssociation, GroupParticipantAssociation
 import json
@@ -18,7 +18,7 @@ from django.db.models import Q, F
 
 @login_required
 def event_list(request):
-    search_query = request.GET.get('search', '')  # Get search term from request
+    search_query = request.GET.get('search', '')
 
     # Order events by newest first and NULL dates last
     events = Event.objects.all().order_by(F('event_date').desc(nulls_last=True))
@@ -39,10 +39,8 @@ def create_event(request):
 
         if 'submit_event' in request.POST and event_form.is_valid():
 
-            # Extract the cleaned data
             event_name = event_form.cleaned_data['event_name']
             event_logo = event_form.cleaned_data['event_logo']
-            required_participant_fields = event_form.cleaned_data['required_participant_fields']
             reglament_lt = event_form.cleaned_data['reglament_lt']
             reglament_en = event_form.cleaned_data['reglament_en']
             registration_deadline = event_form.cleaned_data['registration_deadline']
@@ -71,13 +69,13 @@ def create_event(request):
                 fs = FileSystemStorage()
                 fs.save(event_logo_path, event_logo)
 
-            # Creating a string that looks like JSON, but is a plain string
+            # Creating a string that looks like JSON
             # Example: '{"Vardas": true, "Pavardė": false, "Gimimo metai": true}'
             fields_str = '{' + ', '.join(f'"{key}": {str(value).lower()}' for key, value in fields.items()) + '}'
             # Create a new Event instance and save to the database
             event = Event(
                 name=event_name,
-                required_participant_fields=fields_str,  # Save as a string resembling JSON
+                required_participant_fields=fields_str,
                 reglament_lt=reglament_lt,
                 reglament_en=reglament_en,
                 registration_deadline=registration_deadline,
@@ -86,7 +84,7 @@ def create_event(request):
                 payment_password=payment_password,
             )
             event.save()
-            return redirect('create_event')  # Redirect to refresh the page
+            return redirect('create_event')
         elif 'submit_group' in request.POST and group_form.is_valid():
             # Combine age_from and age_to into a dictionary and convert to JSON string
             age_data = json.dumps({
@@ -94,21 +92,21 @@ def create_event(request):
                 'age_to': group_form.cleaned_data['age_to']
             })
             # Determine gender based on the form's boolean fields
-            if group_form.cleaned_data['male']:  # This will be True if checked
+            if group_form.cleaned_data['male']:
                 gender_data = "male"
-            elif group_form.cleaned_data['female']:  # This will be True if checked
+            elif group_form.cleaned_data['female']:
                 gender_data = "female"
             else:
-                gender_data = None  # If neither is selected, set to None or handle accordingly
+                gender_data = None
 
             # Save the group data to the database
             participant_group = Group(
                 name=group_form.cleaned_data['name'],
-                age=age_data,  # Save as JSON string
+                age=age_data,
                 gender=gender_data,
             )
             participant_group.save()
-            return redirect('create_event')  # Redirect to refresh the page
+            return redirect('create_event')
         elif 'submit_distance' in request.POST and distance_form.is_valid():
             # Combine numbers_from and numbers_to into dictionaries
             numbers_data = json.dumps({
@@ -137,19 +135,17 @@ def create_event(request):
             )
             distance.save()
 
-            # Now, create associations for each selected group
-            selected_groups = distance_form.cleaned_data['groups']  # Retrieve the selected groups
+            selected_groups = distance_form.cleaned_data['groups']
 
             for group in selected_groups:
                 DistanceGroupAssociation.objects.create(distance=distance, group=group)
 
-            # Create and save the association with the selected event
             selected_event = distance_form.cleaned_data['event']
             association = EventDistanceAssociation(event=selected_event, distance=distance)
             association.save()
 
 
-            return redirect('create_event')  # Redirect to refresh the page
+            return redirect('create_event')
     else:
         event_form = EventForm()
         group_form = GroupForm()
@@ -161,7 +157,7 @@ def create_event(request):
     for group in groups:
         if group.age:  # Check if the age field contains data
             try:
-                age_data = json.loads(group.age)  # Parse the JSON data
+                age_data = json.loads(group.age)
                 group.age_from = age_data.get('age_from', None)
                 group.age_to = age_data.get('age_to', None)
             except json.JSONDecodeError:
@@ -237,7 +233,6 @@ def event_detail(request, event_id):
     if shirt_assigned == "yes":
         participants = participants.filter(if_shirt_received=True)
 
-    # Retrieve the associated groups for each participant
     for participant in participants:
         participant.groups = Group.objects.filter(participant_groups__participant=participant)
         participant.distance = participant.distances.first()
@@ -282,12 +277,10 @@ def send_email_to_paid(request, event_id):
         'event': event,
     })
 def edit_event(request, event_id):
-    # Retrieve the existing event or return 404 if not found
     event = get_object_or_404(Event, id=event_id)
     required_fields = json.loads(event.required_participant_fields)
 
     if request.method == 'POST':
-        # Extract data from the POST request
         name = request.POST.get('name')
         selected_fields = request.POST.getlist('required_participant_fields')
         # Convert the selected fields back into a dictionary with True for selected, False for not selected
@@ -311,23 +304,17 @@ def edit_event(request, event_id):
         event.payment_password = payment_password
         event.event_result_link = event_result_link
 
-        # Save the updated event
         event.save()
 
-        # Redirect to the event detail page after saving
         return redirect('event_detail', event_id=event_id)
     else:
-        # Render the event details page with the event object and required fields
         return render(request, 'api/edit_event.html', {'event': event, 'required_fields': required_fields})
 
 def edit_participant(request, participant_id):
-    # Retrieve the existing participant or return 404 if not found
     participant = get_object_or_404(Participant, id=participant_id)
 
-    # Retrieve the associated event (assuming the participant has at least one event)
     event = participant.events.first()
 
-    # Retrieve the associated distance for the participant, if any
     distance_association = DistanceParticipantAssociation.objects.filter(participant=participant).first()
     selected_distance = distance_association.distance if distance_association else None
 
@@ -336,21 +323,16 @@ def edit_participant(request, participant_id):
         if form.is_valid():
             participant = form.save()  # Save the form, which updates the participant object
 
-            # Ensure the event-participant association is created
             if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
                 EventParticipantAssociation.objects.create(event=event, participant=participant)
 
-            # Retrieve the selected distance from POST data
             selected_distance_id = request.POST.get('distance')
 
-            # Ensure the distance exists, and retrieve the Distance object
             selected_distance = get_object_or_404(Distance, id=selected_distance_id)
 
-            # Create the association between participant and distance
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
-            # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
             if request.POST.get('if_paid') == 'on' and not participant.shirt_number:
                 next_available_number = get_next_available_number(selected_distance)
 
@@ -382,17 +364,13 @@ def add_participant(request, event_id):
         if form.is_valid():
             participant = form.save()
 
-            # Ensure the event-participant association is created
             if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
                 EventParticipantAssociation.objects.create(event=event, participant=participant)
 
-            # Retrieve the selected distance from POST data
             selected_distance_id = request.POST.get('distance')
 
-            # Ensure the distance exists, and retrieve the Distance object
             selected_distance = get_object_or_404(Distance, id=selected_distance_id)
 
-            # Create the association between participant and distance
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
@@ -400,26 +378,20 @@ def add_participant(request, event_id):
             today = date.today()
             age = today.year - participant.date_of_birth.year - ((today.month, today.day) < (participant.date_of_birth.month, participant.date_of_birth.day))
 
-            # Get all groups associated with the selected distance
             groups = selected_distance.groups.all()
 
-            # Find all appropriate groups based on gender
             eligible_groups = [
                 group for group in groups if group.gender.lower() == participant.gender.lower()
             ]
-
-            # If no eligible groups found, raise an exception or handle it appropriately
-            if not eligible_groups:
-                return redirect('error_page')  # Or display an error message to the user
 
             closest_group = None
             smallest_age_diff = None
 
             # Loop through the eligible groups to find the closest one based on age
             for group in eligible_groups:
-                age_range = json.loads(group.age)  # Assuming it's stored as a JSON string
+                age_range = json.loads(group.age)
                 if age_range['age_from'] <= age <= age_range['age_to']:
-                    # Calculate the "closeness" of the group based on age range
+                    # Calculate the closeness of the group based on age range
                     age_diff_from = age - age_range['age_from']
                     age_diff_to = age_range['age_to'] - age
                     smallest_age_diff_group = min(age_diff_from, age_diff_to)
@@ -429,13 +401,11 @@ def add_participant(request, event_id):
                         smallest_age_diff = smallest_age_diff_group
                         closest_group = group
 
-            # If a closest group was found, create the association
             if closest_group:
                 GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
 
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
             if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
-                # Get the next available number from the pool (assuming you have a function to fetch the next number)
                 next_available_number = get_next_available_number(selected_distance)
 
                 # Only assign if a valid number is available
@@ -451,13 +421,11 @@ def add_participant(request, event_id):
     return render(request, 'api/add_participant.html', {'event': event, 'form': form})
 
 def get_next_available_number(distance):
-    # Assuming 'distance.numbers' is a string containing JSON-like data
-    numbers_str = distance.numbers  # The string, e.g., '{"numbers_from": 100, "numbers_to": 999}'
+    numbers_str = distance.numbers
 
     # Parse the string into a dictionary
     number_range = json.loads(numbers_str)
 
-    # Now you can safely access the fields
     numbers_from = number_range.get("numbers_from")
     numbers_to = number_range.get("numbers_to")
 
@@ -505,11 +473,9 @@ def export_participants_csv(request, event_id):
     if search_gender:
         participants = participants.filter(gender=search_gender)
 
-    # Create CSV response with UTF-8 encoding to handle Lithuanian characters
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response = HttpResponse(content_type='text/csv; charset=utf-8') # UTF-8 to handle Lithuanian letters
     response['Content-Disposition'] = f'attachment; filename="participants_{event.name}.csv"'
 
-    # Adding BOM to ensure proper encoding in Excel
     response.write("\ufeff")  # BOM for UTF-8
 
     # Create CSV writer with semicolon delimiter
@@ -539,7 +505,7 @@ def export_participants_csv(request, event_id):
             participant.distances.first().name_lt or "N/A",
             participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
             participant.comment or "N/A",
-            participant.phone_number or "N/A",  # This is now in the correct column
+            participant.phone_number or "N/A",
         ]])
 
     return response
@@ -550,7 +516,7 @@ def add_event_results(request, event_id):
     if request.method == 'POST':
         results_link = request.POST.get('results_link')
         if results_link:
-            event.result_link = results_link  # Corrected field
+            event.result_link = results_link
             event.save()
             messages.success(request, "Renginio rezultatai sėkmingai pridėti.")
             return redirect('event_detail', event_id=event_id)
@@ -561,10 +527,8 @@ def add_event_results(request, event_id):
 
 
 def upload_event_photos(request, event_id):
-    # Get the event object
     event = get_object_or_404(Event, id=event_id)
 
-    # Directory path based on event name (in the media folder)
     event_folder = os.path.join(settings.MEDIA_ROOT, 'event_photos', event.name)
 
     # If the directory doesn't exist, create it
@@ -578,9 +542,9 @@ def upload_event_photos(request, event_id):
             # Create the file path to save it locally in the event folder
             fs = FileSystemStorage(location=event_folder)
             filename = fs.save(photo.name, photo)
-            file_url = fs.url(filename)  # You can ignore the file_url if not storing in the DB
+            file_url = fs.url(filename)
 
-        return redirect('event_detail', event_id=event_id)  # Redirect to event detail page
+        return redirect('event_detail', event_id=event_id)
 
     return render(request, 'api/upload_event_photos.html', {'event': event})
 
@@ -614,23 +578,18 @@ def export_all_participants_csv(request, event_id):
     if search_gender:
         participants = participants.filter(gender=search_gender)
 
-    # Create CSV response with UTF-8 encoding to handle Lithuanian characters
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="participants_{event.name}.csv"'
 
-    # Adding BOM to ensure proper encoding in Excel
-    response.write("\ufeff")  # BOM for UTF-8
+    response.write("\ufeff")
 
-    # Create CSV writer with semicolon delimiter
     writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-    # Write the header row
     writer.writerow([smart_str(header) for header in [
         'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'Grupė' ,'El.paštas',
         'Valstybė', 'Miestas', 'Klubas', 'Distancija','Registracijos data', 'Komentaras', 'Telefonas'
     ]])
 
-    # Write participant data
     for participant in participants:
 
         participant.groups = Group.objects.filter(participant_groups__participant=participant)
@@ -648,7 +607,7 @@ def export_all_participants_csv(request, event_id):
             participant.distances.first().name_lt or "N/A",
             participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
             participant.comment or "N/A",
-            participant.phone_number or "N/A",  # This is now in the correct column
+            participant.phone_number or "N/A",
         ]])
 
     return response

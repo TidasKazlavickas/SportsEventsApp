@@ -10,7 +10,7 @@
 <ul>
     {% for event in events %}
         <li>
-            <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> <!-- Link with event ID -->
+            <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
         </li>
     {% endfor %}
 </ul>

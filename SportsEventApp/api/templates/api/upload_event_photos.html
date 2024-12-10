@@ -11,7 +11,7 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <label for="photos">Pasirinkite nuotraukas:</label>
-    <input type="file" name="photos" multiple> <!-- 'multiple' allows multiple files -->
+    <input type="file" name="photos" multiple>
     <button type="submit">Įkelti nuotraukas</button>
 </form>
 

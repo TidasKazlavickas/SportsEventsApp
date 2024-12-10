@@ -91,11 +91,12 @@
 <!-- Add Participant Button -->
 <a href="{% url 'add_participant' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pridėti dalyvį</a>
 
-<!-- Export to CSV Button -->
+<!-- Export Paid Participants To CSV Button -->
 <form action="{% url 'export_participants_csv' event.id %}" method="get">
     <input type="submit" value="Eksportuoti susimokėjusius dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 </form>
 
+<!-- Export All Participants To CSV Button -->
 <form action="{% url 'export_all_participants_csv' event.id %}" method="get">
     <input type="submit" value="Eksportuoti visus dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 </form>
@@ -105,10 +106,14 @@
    style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
     Pridėti renginio rezultatus
 </a>
+
+<!-- Send Email To Paid Participants Button -->
 <a href="{% url 'send_email_to_paid' event.id %}"
    style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
     Siųsti el. laišką sumokėjusiems
 </a>
+
+<!-- Upload Event Photos Button -->
 <a href="{% url 'upload_event_photos' event.id %}">
     <button>Pridėti renginio nuotraukas</button>
 </a>
@@ -119,7 +124,7 @@
     <table>
         <thead>
         <tr>
-            <th>Redaguoti</th>  <!-- Actions column -->
+            <th>Redaguoti</th>
             <th>Numeris</th>
             <th>Vardas</th>
             <th>Pavardė</th>
@@ -158,7 +163,7 @@
                     {% if participant.groups %}
                         <ul style="list-style-type: none; padding: 0; text-align: center;">
                             {% for group in participant.groups %}
-                                <li>{{ group.name }}</li> <!-- Adjust according to your group model field -->
+                                <li>{{ group.name }}</li>
                             {% endfor %}
                         </ul>
                     {% else %}

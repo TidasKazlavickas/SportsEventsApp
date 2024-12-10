@@ -91,7 +91,7 @@ class Participant(models.Model):
     def calculate_payment(self):
             today = date.today()
             distance = self.distances.first()
-            price = float(distance.price)  # Assuming price is stored as a string
+            price = float(distance.price)
             price_extra = float(distance.price_extra)
             price_extra_date = distance.price_extra_date
 

@@ -13,7 +13,7 @@ from api.views import get_next_available_number
 
 
 def event_list(request):
-    events = Event.objects.all()  # Get all events from the database
+    events = Event.objects.all()
     # Retrieve search query parameters
     search_name = request.GET.get('search_name', '')
     search_year = request.GET.get('search_year', '')
@@ -53,37 +53,31 @@ LABEL_TO_FIELD = {
 }
 
 def participant_register(request, event_id):
-    # Get the event object
     event = get_object_or_404(Event, id=event_id)
 
-    # Get the event configuration (JSON string)
     event_config = event.required_participant_fields if event else "{}"
-    config_dict = json.loads(event_config)  # Parse the JSON string
+    config_dict = json.loads(event_config)
 
-    form = ParticipantForm(request.POST or None, event=event)  # Pass the event to the form initialization
+    form = ParticipantForm(request.POST or None, event=event)
 
     # Dynamically hide fields based on the event's configuration
     for label, field_name in LABEL_TO_FIELD.items():
-        if field_name != "distance":  # Skip the 'distance' field, we want it always visible
-            if config_dict.get(label, False) is False:  # Check if the field is marked as False in the config
+        if field_name != "distance":
+            if config_dict.get(label, False) is False:
                 if field_name in form.fields:
                     form.fields[field_name].widget = forms.HiddenInput()  # Hide the field
-                    form.fields[field_name].required = False  # Optionally, make it not required
+                    form.fields[field_name].required = False
 
     if form.is_valid():
         participant = form.save()
 
-        # Ensure the event-participant association is created
         if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
             EventParticipantAssociation.objects.create(event=event, participant=participant)
 
-        # Retrieve the selected distance from POST data
         selected_distance_id = request.POST.get('distance')
 
-        # Ensure the distance exists, and retrieve the Distance object
         selected_distance = get_object_or_404(Distance, id=selected_distance_id)
 
-        # Create the association between participant and distance
         if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
             DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
@@ -91,7 +85,6 @@ def participant_register(request, event_id):
         today = date.today()
         age = today.year - participant.date_of_birth.year - ((today.month, today.day) < (participant.date_of_birth.month, participant.date_of_birth.day))
 
-        # Get all groups associated with the selected distance
         groups = selected_distance.groups.all()
 
         # Find all appropriate groups based on gender
@@ -99,18 +92,14 @@ def participant_register(request, event_id):
             group for group in groups if group.gender.lower() == participant.gender.lower()
         ]
 
-        # If no eligible groups found, raise an exception or handle it appropriately
-        if not eligible_groups:
-            return redirect('error_page')  # Or display an error message to the user
-
         closest_group = None
         smallest_age_diff = None
 
         # Loop through the eligible groups to find the closest one based on age
         for group in eligible_groups:
-            age_range = json.loads(group.age)  # Assuming it's stored as a JSON string
+            age_range = json.loads(group.age)
             if age_range['age_from'] <= age <= age_range['age_to']:
-                # Calculate the "closeness" of the group based on age range
+                # Calculate the closeness of the group based on age range
                 age_diff_from = age - age_range['age_from']
                 age_diff_to = age_range['age_to'] - age
                 smallest_age_diff_group = min(age_diff_from, age_diff_to)
@@ -120,13 +109,12 @@ def participant_register(request, event_id):
                     smallest_age_diff = smallest_age_diff_group
                     closest_group = group
 
-        # If a closest group was found, create the association
         if closest_group:
             GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
 
         # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
         if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
-            # Get the next available number from the pool (assuming you have a function to fetch the next number)
+            # Get the next available number from the pool
             next_available_number = get_next_available_number(selected_distance)
 
             # Only assign if a valid number is available
@@ -136,11 +124,9 @@ def participant_register(request, event_id):
     return render(request, 'frontend/add_participant.html', {'form': form, 'event': event})
 
 def participant_list(request, event_id):
-    # Get the event object
     event = get_object_or_404(Event, id=event_id)
     participants = Participant.objects.filter(events__id=event_id)
 
-    # Retrieve all distances linked to the event
     distances = Distance.objects.filter(eventdistanceassociation__event=event)
 
     # Filter by search query parameters
@@ -176,13 +162,11 @@ def participant_list(request, event_id):
     })
 
 def event_photos(request, event_id):
-    # Get the event object
     event = get_object_or_404(Event, id=event_id)
 
     # Define the path where the event's photos are stored
     event_folder = os.path.join(settings.MEDIA_ROOT, 'event_photos', event.name)
 
-    # Check if the folder exists and retrieve all image files
     if os.path.exists(event_folder):
         photo_files = [f for f in os.listdir(event_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
     else:
