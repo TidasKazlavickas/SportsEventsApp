@@ -1,3 +1,28 @@
+/* General Styles for All Pages */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+h1, h2 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Event List Page Styles */
 .event-container {
     display: flex;
     flex-wrap: wrap;
@@ -5,14 +30,11 @@
     justify-content: center;
 }
 
-.event-item {
-    width: 350px;
-    text-align: center;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.event-item img {
+    width: 100%;  /* Make the image responsive to the container width */
+    height: auto; /* Automatically adjust the height to maintain aspect ratio */
+    object-fit: contain; /* Ensures the entire image is visible, without cropping */
+    border-radius: 5px; /* Optional: to add rounded corners */
 }
 
 .event-logo {
@@ -28,4 +50,341 @@
     font-size: 1.2em;
     font-weight: bold;
     color: #333;
+    text-align: center; /* Center text horizontally */
+    width: 100%;
+}
+
+.event-item .event-name:first-of-type {
+    color: #333;
+}
+
+.event-item .event-name:nth-of-type(2) {
+    color: orangered;
+}
+
+.event-item a:hover {
+    text-decoration: underline;
+}
+
+.event-item {
+    width: 350px;
+    text-align: center; /* Center text horizontally */
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center content horizontally */
+    justify-content: space-between;
+}
+
+.event-item a {
+    display: inline-block; /* Makes links behave like inline elements but allows for block styling */
+    margin: 5px; /* Adds spacing between the links */
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 14px;
+}
+
+.event-links {
+    display: flex; /* Use flexbox to align the links in a row */
+    justify-content: center; /* Center the links horizontally */
+    gap: 10px; /* Space between the links */
+    width: 100%; /* Ensures the links container takes the full width */
+}
+
+/* Form Styles for Event List Search */
+form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 10px;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input[type="text"] {
+    padding: 8px;
+    width: 200px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+form input[type="submit"] {
+    padding: 8px 20px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Participant Registration Page Styles */
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+form input[type="text"], form input[type="email"], form select, form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+form button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+form button:hover {
+    background-color: #45a049;
+}
+
+/* Event Photos Page Styles */
+.photos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.photo-item {
+    position: relative;
+}
+
+.photo-item img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    border-radius: 8px;
+}
+
+.photo-item img:hover {
+    transform: scale(1.1);
+}
+
+.lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 80%;
+    border: 5px solid white;
+}
+
+.lightbox:target {
+    display: flex;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Participant List Page Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+input[type="text"], select {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Participant List Filter Form */
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input[type="text"], form select {
+    padding: 8px;
+    width: 200px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+form input[type="submit"] {
+    padding: 8px 20px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+input[type="text"], select {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Event Search Page */
+#event_list_search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#event_list_search div {
+    display: flex; /* Align label and input in a row */
+    align-items: center; /* Vertically centers label and input */
+    margin-bottom: 15px; /* Adds space between each label/input pair */
+}
+
+#event_list_search label {
+    font-weight: bold;
+    margin-right: 10px; /* Adds space between label and input */
+    width: 150px; /* Fixed width for label */
+    text-align: right;
+}
+
+#event_list_search input[type="text"] {
+    padding: 8px;
+    width: 250px; /* Adjust the width of the input */
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+#event_list_search input[type="submit"] {
+    padding: 8px 20px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+#event_list_search input[type="submit"]:hover {
+    background-color: #45a049;
+}
+/* Form Container */
+form {
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically */
+    gap: 10px; /* Reduced space between form elements */
+    max-width: 500px; /* Optional: limit form width */
+    margin: 50px auto; /* Center the form horizontally */
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Label Styling */
+form label {
+    font-weight: bold;
+    margin-bottom: 3px; /* Reduced space between label and input */
+}
+
+/* Input Fields */
+form input[type="text"],
+form select {
+    padding: 8px;
+    width: 80%; /* Reduced width of inputs */
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 10px; /* Optional: extra spacing between input fields and next element */
+}
+
+/* Submit Button */
+form input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 50%; /* Optional: smaller submit button width */
+    margin-top: 10px;
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049;
 }

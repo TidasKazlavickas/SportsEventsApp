@@ -1,13 +1,18 @@
-<html lang="en">
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 <head>
     <meta charset="UTF-8">
     <title>Registracija | Sporto Renginiai</title>
 </head>
 <body>
+<h1>Registracija į: {{ event.name }}</h1>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
+<a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
 </body>
 </html>

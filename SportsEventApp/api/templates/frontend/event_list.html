@@ -7,14 +7,16 @@
         <title>Renginiai | Sporto Renginiai</title>
 </head>
 <body>
-<form method="get">
+<form method="get" id="event_list_search">
     <h1>Renginių paieška</h1>
-    <label for="search_first_name">Pavadinimas:</label>
-    <input type="text" id="search_name" name="search_name" value="{{ request.GET.search_name }}">
-
-    <label for="search_last_name">Metai:</label>
-    <input type="text" id="search_year" name="search_year" value="{{ request.GET.search_year}}">
-
+    <div>
+        <label for="search_name">Pavadinimas:</label>
+        <input type="text" id="search_name" name="search_name" value="{{ request.GET.search_name }}">
+    </div>
+    <div>
+        <label for="search_year">Metai:</label>
+        <input type="text" id="search_year" name="search_year" value="{{ request.GET.search_year }}">
+    </div>
     <input type="submit" value="Ieškoti">
 </form>
 {% block content %}
@@ -23,16 +25,18 @@
     <div class="event-container">
         {% for event in events %}
             <div class="event-item">
-                <img src="{{ event.logo_path }}" alt="Event Logo" style="width: 300px; height: 200px;">
+                <img src="{{ event.logo_path }}" alt="Event Logo">
                 <p class="event-name" style="width: 300px;"> {{ event.name }}</p>
                 <p class="event-name" style="width: 300px; color:orangered;"> {{ event.event_date }}</p>
-                <a href="{% url 'register_participant' event.id %}">Registruotis</a>
-                <a href="{% url 'participants_front' event.id %}">Dalyviai</a>
-                <!-- Results Button (if link exists) -->
-                {% if event.result_link %}
-                    <a href="{{ event.result_link }}" target="_blank">Rezultatai</a>
-                {% endif %}
-                <a href="{% url 'event_photos' event.id %}">Nuotraukos</a>
+                <div class="event-links">
+                    <a href="{% url 'register_participant' event.id %}">Registruotis</a>
+                    <a href="{% url 'participants_front' event.id %}">Dalyviai</a>
+                    <!-- Results Button (if link exists) -->
+                    {% if event.result_link %}
+                        <a href="{{ event.result_link }}" target="_blank">Rezultatai</a>
+                    {% endif %}
+                    <a href="{% url 'event_photos' event.id %}">Nuotraukos</a>
+                </div>
             </div>
             {% empty %}
             <p>No events available.</p>

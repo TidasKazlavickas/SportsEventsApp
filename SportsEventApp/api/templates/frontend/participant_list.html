@@ -1,34 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
     <title>Dalyviai | Sporto Renginiai</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        input[type="text"], select {
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 <body>
+<h1>Renginio: {{ event.name }} dalyviai</h1>
 <!-- Filter/Search Form -->
 <form method="get">
     <label for="search_first_name">Vardas:</label>
