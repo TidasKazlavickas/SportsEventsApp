@@ -237,3 +237,50 @@ form > div {
 .event-detail-button-container a:hover {
     background-color: #45a049;
 }
+
+.add-participant-form-container {
+    width: 20%; /* Adjust the width of the container */
+    margin: 0 auto; /* Centers the container */
+    padding: 20px;
+    border: 1px solid #ddd; /* Adds a border around the container */
+    border-radius: 8px; /* Rounds the corners */
+    background-color: #f9f9f9; /* Light background color */
+}
+
+.add-participant-form-container table {
+    width: 100%; /* Ensures the table takes up the full width of the container */
+    border-collapse: collapse; /* Ensures borders are collapsed into single lines */
+}
+
+.add-participant-form-container td {
+    padding: 5px 8px; /* Reduces padding inside the table cells */
+    vertical-align: middle; /* Aligns text vertically */
+    font-size: 14px; /* Adjust font size for a smaller look */
+    width: 50%; /* Ensures each column takes up half of the table width */
+}
+
+.add-participant-form-container td label {
+    font-weight: bold; /* Makes the label text bold */
+    color: #333; /* Darker color for labels */
+}
+
+.add-participant-form-container td input,
+.add-participant-form-container td select {
+    width: 100%; /* Ensures form elements take up full width */
+    padding: 5px; /* Reduces padding inside form elements */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+.add-participant-form-container td input:focus,
+.add-participant-form-container td select:focus {
+    border-color: #66afe9; /* Focus effect for form elements */
+    outline: none;
+}
+
+.add-participant-form-container table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Alternates row colors for readability */
+}
+

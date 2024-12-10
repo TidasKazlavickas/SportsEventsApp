@@ -12,6 +12,7 @@
 <form method="post">
     {% csrf_token %}
 
+<div class="add-participant-form-container">
     <table>
         <tr>
             <td><label for="{{ form.first_name.id_for_label }}">Vardas</label></td>
@@ -78,6 +79,7 @@
             <td>{{ form.distance }}</td>
         </tr>
     </table>
+</div>
 
     <button type="submit">Pridėti dalyvį</button>
 </form>
