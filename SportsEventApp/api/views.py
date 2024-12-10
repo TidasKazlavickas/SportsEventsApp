@@ -1,24 +1,35 @@
 import csv
 import os
 from datetime import date
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.encoding import smart_str
-from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm
+from .forms import EventForm, GroupForm, DistanceForm, ParticipantRegistrationForm, ParticipantForm, EmailForm
 from .models import Group, Event, Distance, EventDistanceAssociation, Participant, EventParticipantAssociation, \
     DistanceParticipantAssociation, DistanceGroupAssociation, GroupParticipantAssociation
 import json
+from django.db.models import Q, F
 
 
 @login_required
 def event_list(request):
-    events = Event.objects.all()  # Fetch all events
-    return render(request, 'api/event_list.html', {'events': events})
+    search_query = request.GET.get('search', '')  # Get search term from request
+
+    # Order events by newest first and NULL dates last
+    events = Event.objects.all().order_by(F('event_date').desc(nulls_last=True))
+
+    if search_query:
+        events = events.filter(Q(name__icontains=search_query))
+
+    return render(request, 'api/event_list.html', {
+        'events': events,
+        'search_query': search_query,
+    })
 
 def create_event(request):
     if request.method == 'POST':
@@ -38,8 +49,6 @@ def create_event(request):
             event_date = event_form.cleaned_data['event_date']
             payment_project_id = event_form.cleaned_data['payment_project_id']
             payment_password = event_form.cleaned_data['payment_password']
-            event_result_link = event_form.cleaned_data['event_result_link']
-
             fields = {
                 'Vardas': event_form.cleaned_data.get('is_name_required', False),
                 'Pavardė': event_form.cleaned_data.get('is_surname_required', False),
@@ -75,7 +84,6 @@ def create_event(request):
                 event_date=event_date,
                 payment_project_id=payment_project_id,
                 payment_password=payment_password,
-                event_result_link=event_result_link,
             )
             event.save()
             return redirect('create_event')  # Redirect to refresh the page
@@ -238,7 +246,41 @@ def event_detail(request, event_id):
         'event': event,
         'participants': participants,
     })
+def send_email_to_paid(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    participants = Participant.objects.filter(events=event, if_paid=True)
 
+    if request.method == "POST":
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message_template = form.cleaned_data['message']
+
+            for participant in participants:
+                personalized_message = message_template.format(
+                    name=participant.first_name,
+                    lastname=participant.last_name,
+                    distance=participant.distances.first().name_lt if participant.distances else "N/A",
+                    shirt_number=participant.shirt_number,
+                    event=event.name
+                )
+
+                send_mail(
+                    subject,
+                    personalized_message,
+                    'sportorenginiailt@gmail.com',  # Replace with your sender email
+                    [participant.email],
+                    fail_silently=False,
+                )
+
+            return redirect('event_detail', event_id=event.id)
+    else:
+        form = EmailForm()
+
+    return render(request, 'api/send_email.html', {
+        'form': form,
+        'event': event,
+    })
 def edit_event(request, event_id):
     # Retrieve the existing event or return 404 if not found
     event = get_object_or_404(Event, id=event_id)
@@ -541,3 +583,72 @@ def upload_event_photos(request, event_id):
         return redirect('event_detail', event_id=event_id)  # Redirect to event detail page
 
     return render(request, 'api/upload_event_photos.html', {'event': event})
+
+
+def export_all_participants_csv(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    # Get filtered participants based on the search parameters
+    participants = Participant.objects.filter(events__id=event_id)
+
+    # Get filter parameters from the request
+    search_name = request.GET.get('search_name', '')
+    search_country = request.GET.get('search_country', '')
+    search_city = request.GET.get('search_city', '')
+    search_club = request.GET.get('search_club', '')
+    search_gender = request.GET.get('search_gender', '')
+
+    if search_name:
+        participants = participants.filter(
+            first_name__icontains=search_name) | participants.filter(last_name__icontains=search_name)
+
+    if search_country:
+        participants = participants.filter(country__icontains=search_country)
+
+    if search_city:
+        participants = participants.filter(city__icontains=search_city)
+
+    if search_club:
+        participants = participants.filter(club__icontains=search_club)
+
+    if search_gender:
+        participants = participants.filter(gender=search_gender)
+
+    # Create CSV response with UTF-8 encoding to handle Lithuanian characters
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="participants_{event.name}.csv"'
+
+    # Adding BOM to ensure proper encoding in Excel
+    response.write("\ufeff")  # BOM for UTF-8
+
+    # Create CSV writer with semicolon delimiter
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    # Write the header row
+    writer.writerow([smart_str(header) for header in [
+        'Numeris', 'Vardas', 'Pavardė', 'Gimimo data', 'Lytis', 'Grupė' ,'El.paštas',
+        'Valstybė', 'Miestas', 'Klubas', 'Distancija','Registracijos data', 'Komentaras', 'Telefonas'
+    ]])
+
+    # Write participant data
+    for participant in participants:
+
+        participant.groups = Group.objects.filter(participant_groups__participant=participant)
+        writer.writerow([smart_str(value) for value in [
+            participant.shirt_number or "N/A",
+            participant.first_name or "N/A",
+            participant.last_name or "N/A",
+            participant.date_of_birth.strftime('%Y-%m-%d') if participant.date_of_birth else "N/A",
+            participant.gender or "N/A",
+            participant.groups.first().name or "N/A",
+            participant.email or "N/A",
+            participant.country or "N/A",
+            participant.city or "N/A",
+            participant.club or "N/A",
+            participant.distances.first().name_lt or "N/A",
+            participant.registration_date.strftime('%Y-%m-%d') if participant.registration_date else "N/A",
+            participant.comment or "N/A",
+            participant.phone_number or "N/A",  # This is now in the correct column
+        ]])
+
+    return response

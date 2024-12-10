@@ -1,0 +1,22 @@
+<!-- send_email.html -->
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Siųsti el. laišką</title>
+</head>
+<body>
+<h1>Siųsti el. laišką sumokėjusiems dalyviams - {{ event.name }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><strong>Naudokite šiuos kintamuosius:</strong> <br>
+        <code>{name}</code>, <code>{lastname}</code>, <code>{distance}</code>, <code>{shirt_number}</code>, <code>{event}</code>
+    </p>
+    <input type="submit" value="Siųsti" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+</form>
+
+<a href="{% url 'event_detail' event.id %}">Grįžti į renginio informaciją</a>
+</body>
+</html>

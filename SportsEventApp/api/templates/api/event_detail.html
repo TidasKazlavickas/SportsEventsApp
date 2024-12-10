@@ -93,7 +93,11 @@
 
 <!-- Export to CSV Button -->
 <form action="{% url 'export_participants_csv' event.id %}" method="get">
-    <input type="submit" value="Eksportuoti į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+    <input type="submit" value="Eksportuoti susimokėjusius dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+</form>
+
+<form action="{% url 'export_all_participants_csv' event.id %}" method="get">
+    <input type="submit" value="Eksportuoti visus dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
 </form>
 
 <!-- Add Event Results Button -->
@@ -101,7 +105,10 @@
    style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
     Pridėti renginio rezultatus
 </a>
-
+<a href="{% url 'send_email_to_paid' event.id %}"
+   style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+    Siųsti el. laišką sumokėjusiems
+</a>
 <a href="{% url 'upload_event_photos' event.id %}">
     <button>Pridėti renginio nuotraukas</button>
 </a>
@@ -112,7 +119,7 @@
     <table>
         <thead>
         <tr>
-            <th>Veiksmai</th>  <!-- Actions column -->
+            <th>Redaguoti</th>  <!-- Actions column -->
             <th>Numeris</th>
             <th>Vardas</th>
             <th>Pavardė</th>
@@ -132,6 +139,7 @@
             <th>Mokestis</th>
             <th>Ar sumokėjęs</th>
             <th>Telefonas</th>
+            <th>Ištrinti</th>
         </tr>
         </thead>
         <tbody>
@@ -140,9 +148,6 @@
                 <td>
                     <!-- Change Button -->
                     <a href="{% url 'edit_participant' participant.id %}" style="background-color: #4CAF50; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti</a>
-
-                    <!-- Delete Button -->
-                    <a href="{% url 'delete_participant' participant.id %}" style="background-color: #f44336; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
                 </td>
                 <td>{{ participant.shirt_number }}</td>
                 <td>{{ participant.first_name }}</td>
@@ -173,6 +178,11 @@
                 <td>{{ participant.calculate_payment}}</td>
                 <td>{{ participant.if_paid|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.phone_number }}</td>
+            <td>
+                <!-- Delete Button -->
+                <a href="{% url 'delete_participant' participant.id %}" style="background-color: #f44336; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
+            </td>
+
             </tr>
         {% endfor %}
         </tbody>

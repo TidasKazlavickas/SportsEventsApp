@@ -7,16 +7,28 @@
 <body>
 <h1>Renginių Sąrašas</h1>
 
+<!-- Search Form -->
+<form method="get" action="{% url 'event_list' %}">
+    <label for="search">Ieškoti renginio:</label>
+    <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="Įveskite pavadinimą">
+    <button type="submit">Ieškoti</button>
+</form>
+
+<!-- Event List -->
 <ul>
     {% for event in events %}
         <li>
             <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> <!-- Link with event ID -->
         </li>
+        {% empty %}
+        <li>Nerasta jokių renginių.</li>
     {% endfor %}
 </ul>
 
+<!-- Button to create new event -->
 <form method="get" action="{% url 'create_event' %}">
     <button type="submit">Sukurti naują renginį</button>
 </form>
+
 </body>
 </html>

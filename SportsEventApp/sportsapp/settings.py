@@ -31,6 +31,17 @@ ALLOWED_HOSTS = []
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Mailjet email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'in-v3.mailjet.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '3fe5161a0b862a3d29d7bbd83385a18b'  # Replace with your Mailjet public API key
+EMAIL_HOST_PASSWORD = '37450bca1fb9bb4001b2f8d5ccc6bdce'  # Replace with your Mailjet secret API key
+DEFAULT_FROM_EMAIL = 'sportorenginiailt@gmail.com'  # Replace with your verified sender email
+
+
 # Application definition
 
 INSTALLED_APPS = [
