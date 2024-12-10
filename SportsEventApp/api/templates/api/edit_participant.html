@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Redaguoti dalyvį - {{ participant.first_name }} {{ participant.last_name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 <h1>Redaguoti dalyvį: {{ participant.first_name }} {{ participant.last_name }}</h1>

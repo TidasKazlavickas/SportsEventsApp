@@ -3,36 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ event.name }}</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        input[type="text"], select {
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 <h1>{{ event.name }}</h1>
 
 <!-- Filter/Search Form -->
-<form method="get">
+<form method="get" id="event_details_search">
     <label for="search_first_name">Vardas:</label>
     <input type="text" id="search_first_name" name="search_first_name" value="{{ request.GET.search_first_name }}">
 
@@ -68,12 +46,21 @@
     <label for="search_group">Grupė:</label>
     <select id="search_group" name="search_group">
         <option value="">Visos</option>
+        {% for group in groups %}
+            <option value="{{ group.id }}" {% if request.GET.search_group == group.id|stringformat:"s" %}selected{% endif %}>
+                {{ group.name }}
+            </option>
+        {% endfor %}
     </select>
 
     <label for="search_distance">Distancija:</label>
     <select id="search_distance" name="search_distance">
         <option value="">Visos</option>
-        <!-- Add distances dynamically if available -->
+        {% for distance in distances %}
+            <option value="{{ distance.id }}" {% if request.GET.search_distance == distance.id|stringformat:"s" %}selected{% endif %}>
+                {{ distance.name_lt }}
+            </option>
+        {% endfor %}
     </select>
 
     <label for="number_received">Nr. išduotas?</label>
@@ -85,38 +72,27 @@
     <input type="submit" value="Filtruoti">
 </form>
 
+<div class="event-detail-button-container">
 <!-- Edit Event Button -->
-<a href="{% url 'edit_event' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti renginį</a>
+<a href="{% url 'edit_event' event_id=event.id %}" >Redaguoti renginį</a>
 
 <!-- Add Participant Button -->
-<a href="{% url 'add_participant' event_id=event.id %}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pridėti dalyvį</a>
+<a href="{% url 'add_participant' event_id=event.id %}" >Pridėti dalyvį</a>
 
-<!-- Export Paid Participants To CSV Button -->
-<form action="{% url 'export_participants_csv' event.id %}" method="get">
-    <input type="submit" value="Eksportuoti susimokėjusius dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-</form>
+<a href="{% url 'export_participants_csv' event.id %}" >Eksportuoti susimokėjusius dalyvius į CSV</a>
 
-<!-- Export All Participants To CSV Button -->
-<form action="{% url 'export_all_participants_csv' event.id %}" method="get">
-    <input type="submit" value="Eksportuoti visus dalyvius į CSV" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-</form>
+<a href="{% url 'export_all_participants_csv' event.id %}" >Eksportuoti visus dalyvius į CSV</a>
 
 <!-- Add Event Results Button -->
-<a href="{% url 'add_event_results' event_id=event.id %}"
-   style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-    Pridėti renginio rezultatus
-</a>
+<a href="{% url 'add_event_results' event_id=event.id %}" >Pridėti renginio rezultatus</a>
 
 <!-- Send Email To Paid Participants Button -->
 <a href="{% url 'send_email_to_paid' event.id %}"
-   style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-    Siųsti el. laišką sumokėjusiems
-</a>
+>Siųsti el. laišką sumokėjusiems</a>
 
 <!-- Upload Event Photos Button -->
-<a href="{% url 'upload_event_photos' event.id %}">
-    <button>Pridėti renginio nuotraukas</button>
-</a>
+<a href="{% url 'upload_event_photos' event.id %}" >Pridėti renginio nuotraukas</a>
+</div>
 
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>
@@ -152,7 +128,7 @@
             <tr>
                 <td>
                     <!-- Change Button -->
-                    <a href="{% url 'edit_participant' participant.id %}" style="background-color: #4CAF50; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">Redaguoti</a>
+                    <a href="{% url 'edit_participant' participant.id %}" >Redaguoti</a>
                 </td>
                 <td>{{ participant.shirt_number }}</td>
                 <td>{{ participant.first_name }}</td>
@@ -161,7 +137,7 @@
                 <td>{{ participant.gender }}</td>
                 <td style="text-align: center;">
                     {% if participant.groups %}
-                        <ul style="list-style-type: none; padding: 0; text-align: center;">
+                        <ul>
                             {% for group in participant.groups %}
                                 <li>{{ group.name }}</li>
                             {% endfor %}
@@ -183,10 +159,10 @@
                 <td>{{ participant.calculate_payment}}</td>
                 <td>{{ participant.if_paid|yesno:"Taip,Ne" }}</td>
                 <td>{{ participant.phone_number }}</td>
-            <td>
-                <!-- Delete Button -->
-                <a href="{% url 'delete_participant' participant.id %}" style="background-color: #f44336; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-weight: bold;" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
-            </td>
+                <td>
+                    <!-- Delete Button -->
+                    <a href="{% url 'delete_participant' participant.id %}" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
+                </td>
 
             </tr>
         {% endfor %}

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Pridėti renginio nuotraukas</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 <h1>Pridėti nuotraukas renginiui: {{ event.name }}</h1>

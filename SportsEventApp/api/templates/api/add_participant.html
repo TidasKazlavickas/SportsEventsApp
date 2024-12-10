@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Pridėti dalyvį - {{ event.name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 <h1>Pridėti dalyvį į renginį: {{ event.name }}</h1>

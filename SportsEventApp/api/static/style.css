@@ -1,161 +1,239 @@
-/* Bendras puslapio stilius */
+/* General Styling */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 20px auto;
-    background: white;
-    padding: 20px 30px;
+h1 {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Form & Table Styling */
+form {
+    background-color: #fff;
     border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Puslapio antraštė */
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-/* Sekcijų pavadinimai */
-form h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #495057;
-}
-
-/* Formos elementai */
-form label {
+label {
     font-weight: bold;
-    color: #495057;
-    display: block;
     margin-bottom: 5px;
+    display: inline-block;
+    color: #333;
 }
 
-input[type="text"], input[type="url"], input[type="date"], input[type="file"], select {
+input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
     width: 100%;
     padding: 10px;
-    margin: 5px 0 15px;
-    border: 1px solid #ccc;
+    margin: 8px 0;
+    border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 16px;
 }
 
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+input[type="submit"], button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
     border-radius: 4px;
-    box-sizing: border-box;
-    resize: vertical;
+    transition: background-color 0.3s;
 }
 
-/* Checkbox stilius */
-input[type="checkbox"] {
-    transform: scale(1.2);
-    margin-right: 10px;
+input[type="submit"]:hover, button[type="submit"]:hover {
+    background-color: #45a049;
 }
 
-/* Lentelės stilius */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-size: 16px;
+    margin: 20px 0;
 }
 
-table th, table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+th, td {
+    padding: 12px;
     text-align: left;
+    border: 1px solid #ddd;
 }
 
-table th {
-    background-color: #f8f9fa;
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+td a {
+    color: #4CAF50;
     font-weight: bold;
-    color: #495057;
 }
 
-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+td a:hover {
+    text-decoration: underline;
 }
 
-table tr:hover {
-    background-color: #e9ecef;
+/* Miscellaneous */
+table th, table td {
+    text-align: center;
 }
 
-/* Mygtukų stilius */
-button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 5px 0 0;
-    font-size: 16px;
+button[type="submit"] {
+    margin-top: 20px;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+a:active {
+    color: #2c7a2c;
+}
+
+/* Make sure forms have consistent margins and paddings */
+form > div {
+    margin-bottom: 15px;
+}
+
+/* Form Container */
+#event_details_search {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px; /* Space between form items */
+}
+
+/* Labels */
+#event_details_search label {
+    width: 68px; /* Reduced label width */
     font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    align-self: center;
+    margin-right: 5px; /* Adjusted margin */
+}
+
+/* Input Fields */
+#event_details_search input[type="text"],
+#event_details_search select {
+    width: 300px;
+    padding: 8px;  /* Cleaner input appearance */
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Checkbox Alignment */
+#event_details_search input[type="checkbox"] {
+    width: auto;
+    margin-left: 4px;
+    transform: scale(1.2);
+}
+
+/* Submit Button */
+#event_details_search input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px; /* Matching input padding */
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
+    margin-top: 8px;
 }
 
-/* Pagrindinis (mėlynas) mygtukas */
-button.btn-primary {
-    background-color: #007bff;
-    color: white;
+#event_details_search input[type="submit"]:hover {
+    background-color: #45a049;
 }
 
-button.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* Žalias (Išsaugoti) mygtukas */
-button.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-button.btn-success:hover {
-    background-color: #218838;
-}
-
-/* Lentelės pašalinti mygtuko stilius */
-table input[type="checkbox"] {
-    cursor: pointer;
-}
-
-/* Tarpai tarp sekcijų */
-form div {
-    margin-bottom: 20px;
-}
-
-/* Logotipas įkėlimo mygtukas */
-input[type="file"] {
-    padding: 5px;
-    font-size: 16px;
-}
-
-/* Maži ekranai */
+/* Responsive Design */
 @media (max-width: 768px) {
-    .container {
-        padding: 15px;
+    #event_details_search {
+        display: block;
     }
+    #event_details_search label,
+    #event_details_search input[type="text"],
+    #event_details_search select,
+    #event_details_search input[type="submit"] {
+        width: 100%;
+        margin-bottom: 6px;
+    }
+}
 
-    table {
-        font-size: 14px;
-    }
+/* Button Container */
+.event-detail-button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust gap between buttons */
+    justify-content: flex-start;
+}
 
-    button {
-        font-size: 14px;
-        padding: 8px 15px;
-    }
+/* Styling for anchor links and form buttons inside the container */
+.event-detail-button-container a,
+.event-detail-button-container form {
+    display: inline-block;
+}
 
-    input[type="text"], input[type="url"], input[type="date"], input[type="file"], select {
-        font-size: 14px;
-    }
+.event-detail-button-container form input[type="submit"] {
+    padding: 8px 16px; /* Adjust the padding for a consistent look */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.event-detail-button-container form input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.event-detail-button-container a {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.event-detail-button-container a:hover {
+    background-color: #45a049;
 }

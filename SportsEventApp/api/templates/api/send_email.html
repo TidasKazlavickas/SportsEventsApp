@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Siųsti el. laišką</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 <h1>Siųsti el. laišką sumokėjusiems dalyviams - {{ event.name }}</h1>

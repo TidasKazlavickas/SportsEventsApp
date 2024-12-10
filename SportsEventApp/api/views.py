@@ -179,8 +179,11 @@ def participant_list(request):
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     participants = Participant.objects.filter(events__id=event_id)
-
-    # Filter by search query parameters
+    distances = Distance.objects.filter(eventdistanceassociation__event=event)
+    # Assuming `distances` is a queryset of Distance objects
+    groups = Group.objects.filter(
+        group_associations__distance__in=distances
+    ).distinct()
     search_first_name = request.GET.get('search_first_name', '')
     search_last_name = request.GET.get('search_last_name', '')
     search_email = request.GET.get('search_email', '')
@@ -240,6 +243,8 @@ def event_detail(request, event_id):
     return render(request, 'api/event_detail.html', {
         'event': event,
         'participants': participants,
+        'distances': distances,
+        'groups': groups
     })
 def send_email_to_paid(request, event_id):
     event = get_object_or_404(Event, id=event_id)
