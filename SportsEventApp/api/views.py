@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import date
+from datetime import date, datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -626,3 +626,58 @@ def show_results(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     result_link = event.result_link
     return render(request, 'frontend/show_results.html', {'result_link': result_link})
+
+def upload_participants(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST' and request.FILES['csv_file']:
+        csv_file = request.FILES['csv_file']
+
+        # Check if the file is a CSV
+        if not csv_file.name.endswith('.csv'):
+            return HttpResponse("Not a CSV file", status=400)
+
+        # Read the CSV file
+        reader = csv.DictReader(csv_file.read().decode('utf-8').splitlines())
+
+        for row in reader:
+            # Get the Distance associated with this row, check for 'Distancija' in the CSV
+            try:
+                distance = Distance.objects.get(name_lt=row['Distancija'])
+            except Distance.DoesNotExist:
+                print(f"Distance '{row['Distancija']}' not found for event {event_id}")
+                continue  # Skip if the distance doesn't exist
+
+            # Create the participant object
+            participant = Participant.objects.create(
+                first_name=row['Vardas'],
+                last_name=row['Pavardė'],
+                date_of_birth=datetime.strptime(row['Gimimo data'], '%Y-%m-%d'),
+                gender=row['Lytis'],
+                email=row['El.paštas'],
+                country=row['Valstybė'],
+                city=row['Miestas'],
+                club=row['Klubas'],
+                shirt_size=row.get('Shirt_size', ''),  # Handle missing shirt_size if applicable
+                phone_number=row['Telefonas'],
+                comment=row.get('Komentaras', ''),  # Handle missing comments if applicable
+                registration_date=datetime.strptime(row['Registracijos data'], '%Y-%m-%d'),
+                if_paid=True  # Assuming all rows are paid by default
+            )
+
+            # Link the participant with the Event
+            EventParticipantAssociation.objects.create(event=event, participant=participant)
+
+            # Assign the participant to the selected distance via the association table
+            DistanceParticipantAssociation.objects.create(participant=participant, distance=distance)
+
+            # Optionally assign a shirt number if not already set (if_paid is assumed True)
+            if participant.shirt_number is None:
+                next_available_number = get_next_available_number(distance)
+                if next_available_number is not None:
+                    participant.shirt_number = next_available_number
+                    participant.save()
+
+        return redirect('event_detail', event_id=event_id)
+
+    return render(request, 'api/upload_participants.html', {'event': event})

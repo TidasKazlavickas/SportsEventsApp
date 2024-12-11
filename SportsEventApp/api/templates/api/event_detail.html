@@ -97,12 +97,14 @@
 <a href="{% url 'add_event_results' event_id=event.id %}" >Pridėti renginio rezultatus</a>
 
 <!-- Send Email To Paid Participants Button -->
-<a href="{% url 'send_email_to_paid' event.id %}"
->Siųsti el. laišką sumokėjusiems</a>
+<a href="{% url 'send_email_to_paid' event.id %}">Siųsti el. laišką sumokėjusiems</a>
 
 <!-- Upload Event Photos Button -->
-<a href="{% url 'upload_event_photos' event.id %}" >Pridėti renginio nuotraukas</a>
+<a href="{% url 'upload_event_photos' event.id %}">Pridėti renginio nuotraukas</a>
+
+<a href="{% url 'upload_participants' event.id %}" class="btn btn-primary">Importuoti dalyvius</a>
 </div>
+
 
 <!-- Participant Table -->
 <h2>Dalyvių lentelė</h2>
