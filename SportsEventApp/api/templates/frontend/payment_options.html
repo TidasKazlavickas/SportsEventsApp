@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pasirinkite Mokėjimo Būdą | Sporto Renginiai</title>
+</head>
+<body>
+
+<h1>Mokėjimo galimybės</h1>
+<p>Jūs užsiregistravote į renginį: {{ participant.event.name }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="payment_method">Pasirinkite apmokėjimo būdą:</label>
+    <select name="payment_method" id="payment_method">
+        <option value="online_payment">Mokėti internetu</option>
+        <option value="cash_payment">Mokėti gyvai</option>
+    </select>
+    <button type="submit">Apmokėti</button>
+</form>
+
+    <button type="submit">Patvirtinti</button>
+</form>
+
+<a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
+
+</body>
+</html>
