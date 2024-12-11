@@ -9,6 +9,17 @@
 <body>
 <h1>Renginių Sąrašas</h1>
 
+<div class="navbar">
+    <div class="navbar-links">
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="logout-button">Atsijungti</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Prisijungti</a>
+        {% endif %}
+    </div>
+</div>
+
+
 <!-- Search Form -->
 <form method="get" action="{% url 'event_list' %}">
     <label for="search">Ieškoti renginio:</label>

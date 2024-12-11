@@ -4,6 +4,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.core.mail import send_mail
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse, HttpResponse
@@ -616,3 +617,7 @@ def export_all_participants_csv(request, event_id):
         ]])
 
     return response
+
+def custom_logout(request):
+    logout(request)
+    return redirect('login')

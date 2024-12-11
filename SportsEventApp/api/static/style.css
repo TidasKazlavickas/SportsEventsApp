@@ -284,3 +284,31 @@ form > div {
     background-color: #f2f2f2; /* Alternates row colors for readability */
 }
 
+/* Navigation bar styles */
+.navbar {
+    width: 100%;
+    background-color: #fff;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+}
+
+.logout-button, .login-button {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: orangered;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+.logout-button:hover, .login-button:hover {
+    background-color: darkred;
+}

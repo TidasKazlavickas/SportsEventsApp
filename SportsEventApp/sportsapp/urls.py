@@ -1,8 +1,9 @@
 from django.urls import path
 from api import views, views_frontend
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import views as auth_views, login
 from django.conf import settings
 from django.conf.urls.static import static
+from api.views import custom_logout
 
 urlpatterns = [
     # Back-end URLs
@@ -19,7 +20,7 @@ urlpatterns = [
     path('event/<int:event_id>/export_all_participants_csv/', views.export_all_participants_csv, name='export_all_participants_csv'),
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
     path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', custom_logout, name='logout'),
     path('event/<int:event_id>/add_results/', views.add_event_results, name='add_event_results'),
     path('event/<int:event_id>/upload_photos/', views.upload_event_photos, name='upload_event_photos'),
     path('send-email-to-paid/<int:event_id>/', views.send_email_to_paid, name='send_email_to_paid'),
