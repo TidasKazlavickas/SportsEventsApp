@@ -30,6 +30,7 @@ urlpatterns = [
     path('register-participant/<int:event_id>', views_frontend.participant_register, name='register_participant'),
     path('participant-list/<int:event_id>', views_frontend.participant_list, name='participants_front'),
     path('event/<int:event_id>/photos/', views_frontend.event_photos, name='event_photos'),
+    path('results/<int:event_id>/', views.show_results, name='show_results'),
 ]
 
 if settings.DEBUG:

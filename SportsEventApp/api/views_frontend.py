@@ -176,3 +176,9 @@ def event_photos(request, event_id):
     photo_urls = [os.path.join(settings.MEDIA_URL, 'event_photos', event.name, photo) for photo in photo_files]
 
     return render(request, 'frontend/event_photos.html', {'event': event, 'photo_urls': photo_urls})
+
+def show_results(request, event_id):
+    # Fetch the event using event_id
+    event = get_object_or_404(Event, id=event_id)
+    result_link = event.result_link
+    return render(request, 'frontend/show_results.html', {'result_link': result_link})

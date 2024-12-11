@@ -621,3 +621,8 @@ def export_all_participants_csv(request, event_id):
 def custom_logout(request):
     logout(request)
     return redirect('login')
+
+def show_results(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    result_link = event.result_link
+    return render(request, 'frontend/show_results.html', {'result_link': result_link})

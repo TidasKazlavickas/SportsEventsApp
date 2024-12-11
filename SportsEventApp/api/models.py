@@ -1,4 +1,6 @@
 from datetime import date
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.utils import timezone
 from django.db import models
 
@@ -26,9 +28,16 @@ class Event(models.Model):
     class Meta:
         db_table = 'sports_event'
 
+    def clean(self):
+        # Validate result_link manually
+        url_validator = URLValidator()
+        try:
+            url_validator(self.result_link)
+        except ValidationError:
+            raise ValidationError({'result_link': "Enter a valid URL."})
+
     def __str__(self):
         return self.name
-
 
 class Distance(models.Model):
     name_lt = models.CharField(db_column='Name_LT', max_length=255)
