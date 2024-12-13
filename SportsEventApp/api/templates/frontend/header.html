@@ -1,0 +1,15 @@
+<header>
+    <nav>
+        <ul class="nav-links">
+            <li><a href="{% url 'about_us' %}">Apie mus</a></li>
+            <li><a href="{% url 'privacy_policy' %}" class="btn">Privatumo Politika</a></li>
+            <li><a href="{% url 'contact' %}">Kontaktai</a></li>
+            <li><a href="{% url 'events' %}">Renginiai</a></li>
+        </ul>
+    </nav>
+</header>
+
+{% block content %}
+    <!-- Content will go here when extended in the child templates -->
+{% endblock %}
+

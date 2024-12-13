@@ -1,5 +1,8 @@
 import os
 from datetime import date
+
+from django.http import HttpResponseRedirect
+
 from api.forms import ParticipantForm
 from api.models import Event, Distance, DistanceParticipantAssociation, GroupParticipantAssociation, \
     EventParticipantAssociation, Participant
@@ -212,3 +215,12 @@ def payment_success(request, participant_id):
 def payment_pending(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
     return render(request, 'frontend/payment_pending.html', {'participant': participant})
+
+def about_us(request):
+    return render(request, 'frontend/about_us.html')
+
+def privacy_policy(request):
+    return HttpResponseRedirect('/static/pdf/privatumo_politikos_taisykles.pdf')
+
+def contact(request):
+    return render(request, 'frontend/contacts.html')

@@ -1,0 +1,17 @@
+{% extends "frontend/base.html" %}
+
+{% load static %} <!-- This line loads the static files -->
+
+{% block content %}
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Pagrindinis</a></li>
+                <li><a href="/apie-mus">Apie mus</a></li>
+                <li><a href="/kontaktai">Kontaktai</a></li>
+                <!-- Add a link to the Privacy Policy PDF -->
+                <li><a href="{% static 'pdf/privatumo_politikos_taisykles.pdf' %}" target="_blank" class="btn">Privatumo Politika</a></li>
+            </ul>
+        </nav>
+    </header>
+{% endblock %}

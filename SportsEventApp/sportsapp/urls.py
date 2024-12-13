@@ -35,6 +35,9 @@ urlpatterns = [
     path('payment-options/<int:participant_id>/<int:event_id>/<int:selected_distance>/',views_frontend.payment_options,name='payment_options'),
     path('payment-success/<int:participant_id>/', views_frontend.payment_success, name='payment_success'),
     path('payment-pending/<int:participant_id>/', views_frontend.payment_pending, name='payment_pending'),
+    path('apie-mus/', views_frontend.about_us, name='about_us'),
+    path('privatumo-politika/', views_frontend.privacy_policy, name='privacy_policy'),
+    path('kontaktai/', views_frontend.contact, name='contact'),
 ]
 
 if settings.DEBUG:
