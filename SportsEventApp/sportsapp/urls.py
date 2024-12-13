@@ -32,7 +32,7 @@ urlpatterns = [
     path('participant-list/<int:event_id>', views_frontend.participant_list, name='participants_front'),
     path('event/<int:event_id>/photos/', views_frontend.event_photos, name='event_photos'),
     path('results/<int:event_id>/', views.show_results, name='show_results'),
-    path('payment-options/<int:participant_id>/', views_frontend.payment_options, name = 'payment_options'),
+    path('payment-options/<int:participant_id>/<int:event_id>/<int:selected_distance>/',views_frontend.payment_options,name='payment_options'),
     path('payment-success/<int:participant_id>/', views_frontend.payment_success, name='payment_success'),
     path('payment-pending/<int:participant_id>/', views_frontend.payment_pending, name='payment_pending'),
 ]

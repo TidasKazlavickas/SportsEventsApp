@@ -112,7 +112,7 @@ def participant_register(request, event_id):
             GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
 
         # Redirect to the payment options page or simulate payment if necessary
-        return redirect('payment_options', participant_id=participant.id)
+        return redirect('payment_options', participant_id=participant.id, event_id=event.id, selected_distance=selected_distance.id)
 
     return render(request, 'frontend/add_participant.html', {'form': form, 'event': event})
 
@@ -177,11 +177,11 @@ def show_results(request, event_id):
     result_link = event.result_link
     return render(request, 'frontend/show_results.html', {'result_link': result_link})
 
-def payment_options(request, participant_id, selected_distance=None):
-    # Get the participant object
+def payment_options(request, participant_id, event_id, selected_distance):
     participant = get_object_or_404(Participant, id=participant_id)
+    event = get_object_or_404(Event, id=event_id)
+    selected_distance = get_object_or_404(Distance, id=selected_distance)
 
-    # If the participant is already marked as paid, you can skip this
     if participant.if_paid:
         return redirect('participant_details', participant_id=participant_id)
 
@@ -189,25 +189,21 @@ def payment_options(request, participant_id, selected_distance=None):
         payment_method = request.POST.get('payment_method')
 
         if payment_method == 'online_payment':  # Simulate online payment
-            # Mark the participant as paid
             participant.if_paid = True
             participant.save()
 
-            # If they paid online, assign a shirt number
-        if not participant.shirt_number:
-            next_available_number = get_next_available_number(selected_distance)
-            if next_available_number:
-                participant.shirt_number = next_available_number
-                participant.save()
+            if not participant.shirt_number:
+                next_available_number = get_next_available_number(selected_distance)
+                if next_available_number:
+                    participant.shirt_number = next_available_number
+                    participant.save()
 
-            # Redirect to a confirmation page or back to the event
             return redirect('payment_success', participant_id=participant_id)
 
-        elif payment_method == 'cash_payment':  # If they pay cash
-            # Leave the participant with if_paid=False, they will pay on-site
-            return redirect('event_detail', event_id=participant.event.id)
+        elif payment_method == 'cash_payment':
+            return redirect('event_detail', event_id=event_id)
 
-    return render(request, 'frontend/payment_options.html', {'participant': participant})
+    return render(request, 'frontend/payment_options.html', {'participant': participant, 'event': event})
 
 def payment_success(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
