@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 from datetime import date, datetime
 from django.conf import settings
@@ -627,57 +628,87 @@ def show_results(request, event_id):
     result_link = event.result_link
     return render(request, 'frontend/show_results.html', {'result_link': result_link})
 
+
+logger = logging.getLogger(__name__)
+
 def upload_participants(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    errors = []
 
-    if request.method == 'POST' and request.FILES['csv_file']:
-        csv_file = request.FILES['csv_file']
+    if request.method == 'POST':
+        if 'file' not in request.FILES:
+            messages.error(request, "Please upload a file.")
+            return redirect('upload_participants', event_id=event_id)
 
-        # Check if the file is a CSV
-        if not csv_file.name.endswith('.csv'):
-            return HttpResponse("Not a CSV file", status=400)
+        csv_file = request.FILES['file']
+        try:
+            # Decode file and read rows
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            csv_reader = csv.DictReader(decoded_file)
+        except UnicodeDecodeError as e:
+            logger.error(f"File encoding error: {e}")
+            messages.error(request, "There was an issue with file encoding. Please upload a valid CSV file.")
+            return redirect('upload_participants', event_id=event_id)
 
-        # Read the CSV file
-        reader = csv.DictReader(csv_file.read().decode('utf-8').splitlines())
+        # Iterate over rows in CSV file
+        for row in csv_reader:
+            logger.debug(f"Row data: {row}")
 
-        for row in reader:
-            # Get the Distance associated with this row, check for 'Distancija' in the CSV
+            # Check for required 'Distancija' column
+            selected_distance_name = row.get('Distancija')
+            if not selected_distance_name:
+                errors.append("Missing 'Distancija' column or value.")
+                continue
+
+            # Debugging line to log the value of Distancija from CSV
+            logger.debug(f"Looking for distance: {selected_distance_name}")
+
             try:
-                distance = Distance.objects.get(name_lt=row['Distancija'])
+                # Look for the Distance in the database with the exact name_lt value
+                selected_distance = Distance.objects.get(
+                    eventdistanceassociation__event=event,
+                    name_lt=selected_distance_name
+                )
+                logger.debug(f"Found distance: {selected_distance.name_lt}")  # Confirm the match
+
             except Distance.DoesNotExist:
-                print(f"Distance '{row['Distancija']}' not found for event {event_id}")
-                continue  # Skip if the distance doesn't exist
+                errors.append(f"Distance '{selected_distance_name}' not found for this event.")
+                continue
 
-            # Create the participant object
-            participant = Participant.objects.create(
-                first_name=row['Vardas'],
-                last_name=row['Pavardė'],
-                date_of_birth=datetime.strptime(row['Gimimo data'], '%Y-%m-%d'),
-                gender=row['Lytis'],
-                email=row['El.paštas'],
-                country=row['Valstybė'],
-                city=row['Miestas'],
-                club=row['Klubas'],
-                shirt_size=row.get('Shirt_size', ''),  # Handle missing shirt_size if applicable
-                phone_number=row['Telefonas'],
-                comment=row.get('Komentaras', ''),  # Handle missing comments if applicable
-                registration_date=datetime.strptime(row['Registracijos data'], '%Y-%m-%d'),
-                if_paid=True  # Assuming all rows are paid by default
-            )
+            # Create participant record
+            try:
+                participant = Participant.objects.create(
+                    first_name=row['Vardas'],
+                    last_name=row['Pavardė'],
+                    date_of_birth=row['Gimimo data'],
+                    gender=row['Lytis'],
+                    email=row['El.paštas'],
+                    country=row['Valstybė'],
+                    city=row['Miestas'],
+                    club=row['Klubas'],
+                    phone_number=row['Telefonas'],
+                    comment=row['Komentaras'],
+                    registration_date=row['Registracijos data'],
+                )
+                logger.debug(f"Created participant: {participant.first_name} {participant.last_name}")
 
-            # Link the participant with the Event
-            EventParticipantAssociation.objects.create(event=event, participant=participant)
+                # Create associations
+                EventParticipantAssociation.objects.get_or_create(event=event, participant=participant)
+                DistanceParticipantAssociation.objects.get_or_create(distance=selected_distance, participant=participant)
 
-            # Assign the participant to the selected distance via the association table
-            DistanceParticipantAssociation.objects.create(participant=participant, distance=distance)
+            except KeyError as ke:
+                logger.error(f"Missing field in row: {ke}")
+                errors.append(f"Missing field: {ke}")
+            except Exception as e:
+                logger.error(f"Unexpected error while creating participant: {e}")
+                errors.append(f"Unexpected error: {str(e)}")
 
-            # Optionally assign a shirt number if not already set (if_paid is assumed True)
-            if participant.shirt_number is None:
-                next_available_number = get_next_available_number(distance)
-                if next_available_number is not None:
-                    participant.shirt_number = next_available_number
-                    participant.save()
+        if errors:
+            logger.error(f"Errors during upload: {errors}")
+            messages.error(request, "Errors occurred during the upload process.")
+            return redirect('upload_participants', event_id=event_id)
 
+        messages.success(request, "Participants uploaded successfully.")
         return redirect('event_detail', event_id=event_id)
 
     return render(request, 'api/upload_participants.html', {'event': event})
