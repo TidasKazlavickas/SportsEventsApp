@@ -1,5 +1,7 @@
 import os
 from datetime import date
+
+from django.core.mail import send_mail
 from paypalrestsdk import Payment
 from django.http import HttpResponseRedirect, HttpResponse
 from .paypal_config import paypalrestsdk
@@ -251,12 +253,10 @@ def paypal_execute(request, participant_id, distance_id):
     payment = Payment.find(payment_id)
 
     if payment.execute({"payer_id": payer_id}):
-        # Mark participant as paid
         participant = get_object_or_404(Participant, id=participant_id)
         participant.if_paid = True
         participant.save()
 
-        # Assign a shirt number
         distance = get_object_or_404(Distance, id=distance_id)
         if not participant.shirt_number:
             next_available_number = get_next_available_number(distance)
@@ -264,10 +264,37 @@ def paypal_execute(request, participant_id, distance_id):
                 participant.shirt_number = next_available_number
                 participant.save()
 
+        send_confirmation_email(participant)
+
         return redirect('payment_success', participant_id=participant_id)
     else:
         return HttpResponse("Payment execution failed.", status=400)
 
+def send_confirmation_email(participant):
+    event = participant.events.first()
+    if not event:
+        raise ValueError("Participant is not associated with any event.")
+
+    distance = participant.distances.first()
+
+    subject = "Patvirtinimas: Jūsų registracija į renginį sėkminga"
+    message = (
+        f"Gerb. {participant.first_name} {participant.last_name},\n\n"
+        f"Jūs sėkmingai užsiregistravote į sporto renginį: {event.name}.\n"
+        f"Renginio data: {event.event_date.strftime('%Y-%m-%d')}.\n"
+        f"Distancija: {distance.name_lt if distance else 'N/A'}.\n"
+        f"Jūsų marškinėlių numeris: {participant.shirt_number}.\n\n"
+        f"Laukiame Jūsų renginyje!\n\n"
+        f"Pagarbiai,\nSporto renginių komanda"
+    )
+
+    send_mail(
+        subject,
+        message,
+        'sportorenginiailt@gmail.com',
+        [participant.email],
+        fail_silently=False,
+    )
 
 def about_us(request):
     return render(request, 'frontend/about_us.html')
@@ -277,3 +304,5 @@ def privacy_policy(request):
 
 def contact(request):
     return render(request, 'frontend/contacts.html')
+
+
