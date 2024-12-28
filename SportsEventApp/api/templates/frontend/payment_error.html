@@ -1,0 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
+<head>
+    <meta charset="UTF-8">
+    <title>Mokėjimo klaida | Sporto Renginiai</title>
+</head>
+<body>
+<h1>Įvyko klaida atliekant mokėjimą</h1>
+<p>{{ error }}</p>
+<a href="{% url 'payment_options' %}">Grįžti į mokėjimo galimybes</a>
+</body>
+</html>

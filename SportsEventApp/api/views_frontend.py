@@ -1,8 +1,9 @@
 import os
 from datetime import date
-
-from django.http import HttpResponseRedirect
-
+from paypalrestsdk import Payment
+from django.http import HttpResponseRedirect, HttpResponse
+from .paypal_config import paypalrestsdk
+from django.urls import reverse
 from api.forms import ParticipantForm
 from api.models import Event, Distance, DistanceParticipantAssociation, GroupParticipantAssociation, \
     EventParticipantAssociation, Participant
@@ -191,20 +192,47 @@ def payment_options(request, participant_id, event_id, selected_distance):
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
-        if payment_method == 'online_payment':  # Simulate online payment
-            participant.if_paid = True
-            participant.save()
+        if payment_method == 'online_payment':
+            # Create PayPal Payment
+            payment = Payment({
+                "intent": "sale",
+                "payer": {
+                    "payment_method": "paypal"
+                },
+                "redirect_urls": {
+                    "return_url": request.build_absolute_uri(reverse('paypal_execute', args=[participant_id, selected_distance.id])),
+                    "cancel_url": request.build_absolute_uri(reverse('payment_options', args=[participant_id, event_id, selected_distance.id]))
+                },
+                "transactions": [{
+                    "item_list": {
+                        "items": [{
+                            "name": f"Registration for {event.name}",
+                            "sku": "001",
+                            "price": selected_distance.price,
+                            "currency": "USD",
+                            "quantity": 1
+                        }]
+                    },
+                    "amount": {
+                        "total": selected_distance.price,
+                        "currency": "USD"
+                    },
+                    "description": f"Registration for {event.name}"
+                }]
+            })
 
-            if not participant.shirt_number:
-                next_available_number = get_next_available_number(selected_distance)
-                if next_available_number:
-                    participant.shirt_number = next_available_number
-                    participant.save()
-
-            return redirect('payment_success', participant_id=participant_id)
+            if payment.create():
+                # Redirect to PayPal for payment
+                for link in payment.links:
+                    if link.rel == "approval_url":
+                        return redirect(link.href)
+            else:
+                return render(request, 'frontend/payment_error.html', {"error": "Error creating PayPal payment."})
 
         elif payment_method == 'cash_payment':
-            return redirect('event_detail', event_id=event_id)
+            participant.if_paid = False  # Ensure not marked as paid
+            participant.save()
+            return redirect('payment_pending', participant_id=participant_id)
 
     return render(request, 'frontend/payment_options.html', {'participant': participant, 'event': event})
 
@@ -215,6 +243,31 @@ def payment_success(request, participant_id):
 def payment_pending(request, participant_id):
     participant = get_object_or_404(Participant, id=participant_id)
     return render(request, 'frontend/payment_pending.html', {'participant': participant})
+
+def paypal_execute(request, participant_id, distance_id):
+    payment_id = request.GET.get('paymentId')
+    payer_id = request.GET.get('PayerID')
+
+    payment = Payment.find(payment_id)
+
+    if payment.execute({"payer_id": payer_id}):
+        # Mark participant as paid
+        participant = get_object_or_404(Participant, id=participant_id)
+        participant.if_paid = True
+        participant.save()
+
+        # Assign a shirt number
+        distance = get_object_or_404(Distance, id=distance_id)
+        if not participant.shirt_number:
+            next_available_number = get_next_available_number(distance)
+            if next_available_number:
+                participant.shirt_number = next_available_number
+                participant.save()
+
+        return redirect('payment_success', participant_id=participant_id)
+    else:
+        return HttpResponse("Payment execution failed.", status=400)
+
 
 def about_us(request):
     return render(request, 'frontend/about_us.html')
