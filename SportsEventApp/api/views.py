@@ -629,8 +629,6 @@ def show_results(request, event_id):
     return render(request, 'frontend/show_results.html', {'result_link': result_link})
 
 
-logger = logging.getLogger(__name__)
-
 def upload_participants(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     errors = []
@@ -649,7 +647,7 @@ def upload_participants(request, event_id):
             # Normalize column names
             if csv_reader.fieldnames:
                 csv_reader.fieldnames = [field.strip() for field in csv_reader.fieldnames]
-            logger.error(f"Fieldnames: {csv_reader.fieldnames}")  # Debug column headers
+
 
             # Check for missing columns
             required_columns = [
@@ -660,33 +658,33 @@ def upload_participants(request, event_id):
             missing_columns = [col for col in required_columns if col not in csv_reader.fieldnames]
             if missing_columns:
                 errors.append(f"Missing columns: {', '.join(missing_columns)}")
-                logger.error(f"Missing columns: {missing_columns}")
+
                 return redirect('upload_participants', event_id=event_id)
 
         except UnicodeDecodeError as e:
-            logger.error(f"File encoding error: {e}")
+
             messages.error(request, "There was an issue with file encoding. Please upload a valid CSV file.")
             return redirect('upload_participants', event_id=event_id)
 
         # Process each row in the CSV file
         for row in csv_reader:
-            logger.debug(f"Row data: {row}")
+
 
             # Check for 'Distancija' column
             selected_distance_name = row.get('Distancija', '').strip()  # Strip spaces
             if not selected_distance_name:
                 errors.append("Missing 'Distancija' column or value.")
-                logger.debug(f"Row missing 'Distancija': {row}")
+
                 continue
 
-            logger.debug(f"Looking for distance: {selected_distance_name}")
+
 
             try:
                 selected_distance = Distance.objects.get(
                     eventdistanceassociation__event=event,
                     name_lt=selected_distance_name
                 )
-                logger.debug(f"Found distance: {selected_distance.name_lt}")
+
 
             except Distance.DoesNotExist:
                 errors.append(f"Distance '{selected_distance_name}' not found for this event.")
@@ -707,23 +705,60 @@ def upload_participants(request, event_id):
                     comment=row['Komentaras'].strip(),
                     registration_date=row['Registracijos data'].strip(),
                 )
-                logger.debug(f"Created participant: {participant.first_name} {participant.last_name}")
+
 
                 # Create associations
                 EventParticipantAssociation.objects.get_or_create(event=event, participant=participant)
                 DistanceParticipantAssociation.objects.get_or_create(distance=selected_distance, participant=participant)
 
-                
+                # Calculate the participant's age
+                today = date.today()
+                participant_date_of_birth = datetime.strptime(participant.date_of_birth, "%Y-%m-%d").date()
+                age = today.year - participant_date_of_birth.year - ((today.month, today.day) < (participant_date_of_birth.month, participant_date_of_birth.day))
+
+                groups = selected_distance.groups.all()
+
+                eligible_groups = [
+                    group for group in groups if group.gender.lower() == participant.gender.lower()
+                ]
+
+                closest_group = None
+                smallest_age_diff = None
+
+                # Loop through the eligible groups to find the closest one based on age
+                for group in eligible_groups:
+                    age_range = json.loads(group.age)
+                    if age_range['age_from'] <= age <= age_range['age_to']:
+                        # Calculate the closeness of the group based on age range
+                        age_diff_from = age - age_range['age_from']
+                        age_diff_to = age_range['age_to'] - age
+                        smallest_age_diff_group = min(age_diff_from, age_diff_to)
+
+                        # Check if this group is closer than the previous closest
+                        if smallest_age_diff is None or smallest_age_diff_group < smallest_age_diff:
+                            smallest_age_diff = smallest_age_diff_group
+                            closest_group = group
+
+                if closest_group:
+                    GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
+
+                next_available_number = get_next_available_number(selected_distance)
+
+                # Only assign if a valid number is available
+                if next_available_number is not None:
+                    participant.shirt_number = next_available_number
+                    participant.if_paid = True
+                    participant.save()
             except KeyError as ke:
-                logger.error(f"Missing field in row: {ke}")
+
                 errors.append(f"Missing field: {ke}")
             except Exception as e:
-                logger.error(f"Unexpected error while creating participant: {e}")
+
                 errors.append(f"Unexpected error: {str(e)}")
 
         # Handle any errors that occurred during processing
         if errors:
-            logger.error(f"Errors during upload: {errors}")
+
             messages.error(request, "Errors occurred during the upload process.")
             return redirect('upload_participants', event_id=event_id)
 
