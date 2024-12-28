@@ -10,8 +10,33 @@
 <h1>Registracija į: {{ event.name }}</h1>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
+    <table>
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                <tr>
+                    <td>
+                        <label for="{{ field.id_for_label }}">
+                            {% if field.name == 'first_name' %}Vardas{% elif field.name == 'last_name' %}Pavardė
+                            {% elif field.name == 'date_of_birth' %}Gimimo data{% elif field.name == 'gender' %}Lytis
+                            {% elif field.name == 'email' %}El. paštas{% elif field.name == 'country' %}Valstybė
+                            {% elif field.name == 'city' %}Miestas{% elif field.name == 'club' %}Klubas
+                            {% elif field.name == 'shirt_size' %}Marškinėlių dydis{% elif field.name == 'phone_number' %}Telefonas
+                            {% elif field.name == 'comment' %}Komentaras{% elif field.name == 'distance' %}Distancija
+                                {% else %}{{ field.label }}
+                            {% endif %}
+                            {% if field.field.required %}
+                                <span style="color: red;">*</span>
+                            {% endif %}
+                        </label>
+                    </td>
+                    <td>{{ field }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    <button type="submit">Registruotis</button>
 </form>
 <a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
 </body>

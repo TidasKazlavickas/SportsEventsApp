@@ -465,3 +465,9 @@ header {
     text-decoration: underline;
     color: #333;  /* Change link color to black on hover */
 }
+
+.required-asterisk {
+    color: red;
+    font-weight: bold;
+    margin-left: 2px;
+}
