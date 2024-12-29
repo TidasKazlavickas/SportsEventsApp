@@ -11,6 +11,8 @@
 
 <div class="navbar">
     <div class="navbar-links">
+        <a href="{% url 'events' %}" class="btn btn-primary">Peržiūrėti pagrindini puslapį</a>
+
         {% if user.is_authenticated %}
             <a href="{% url 'logout' %}" class="logout-button">Atsijungti</a>
         {% else %}
