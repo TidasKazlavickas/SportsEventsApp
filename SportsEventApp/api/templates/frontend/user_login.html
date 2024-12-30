@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
+{% block content %}
+    <h1>Dalyvio prisijungimas</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Prisijungti</button>
+    </form>
+    <a href="{% url 'register' %}">Neturite paskyros? Registruotis čia</a>
+{% endblock %}

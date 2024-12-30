@@ -4,11 +4,21 @@
 <link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 <head>
     <meta charset="UTF-8">
-        <title>Renginiai | Sporto Renginiai</title>
+    <title>Renginiai | Sporto Renginiai</title>
 </head>
 <body>
 
 {% include 'frontend/header.html' %}
+
+<div class="auth-buttons">
+    {% if user.is_authenticated %}
+        <p>Sveiki, <a href="{% url 'user_profile' user.id %}">{{ user.username }}</a>!</p>
+        <a href="{% url 'logout' %}" class="auth-btn logout-btn">Atsijungti</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="auth-btn login-btn">Prisijungti</a>
+        <a href="{% url 'register' %}" class="auth-btn register-btn">Sukurti paskyrą</a>
+    {% endif %}
+</div>
 
 <form method="get" id="event_list_search">
     <h1>Renginių paieška</h1>

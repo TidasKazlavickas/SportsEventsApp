@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
+{% block content %}
+    <h1>Mano renginiai</h1>
+    <ul>
+        {% for entry in user_event_distances %}
+            <li>
+                Renginys: {{ entry.event.name }}<br>
+                Distancija: {{ entry.distance.name_lt }}<br>
+                Data: {{ entry.event.event_date }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

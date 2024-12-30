@@ -147,7 +147,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/events/'
+LOGIN_REDIRECT_URL = '/events-front/'
 LOGOUT_REDIRECT_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 

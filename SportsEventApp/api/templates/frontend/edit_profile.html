@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Profilio redagavimas</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Išsaugoti pakeitimus</button>
+    </form>
+
+    <a href="{% url 'profile' %}">Grįžti į profilį</a>
+{% endblock %}

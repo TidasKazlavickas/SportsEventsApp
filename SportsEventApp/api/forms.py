@@ -1,7 +1,7 @@
 import json
 
 from django import forms
-from .models import Participant, Event, Distance, EventDistanceAssociation, Group, DistanceGroupAssociation
+from .models import Participant, Event, Distance, EventDistanceAssociation, Group, DistanceGroupAssociation, UserProfile
 
 
 class EventForm(forms.Form):
@@ -142,9 +142,10 @@ class ParticipantForm(forms.ModelForm):
             'distance': forms.Select(),
         }
 
-    # Dynamically update the distance field based on the selected event
+    # Dynamically update the distance field based on the selected event and pre-fill for logged-in users
     def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event', None)
+        event = kwargs.pop('event', None)  # Event to filter distances
+        user = kwargs.pop('user', None)  # User to pre-fill fields
         super().__init__(*args, **kwargs)
 
         if event:
@@ -153,10 +154,23 @@ class ParticipantForm(forms.ModelForm):
                 id__in=EventDistanceAssociation.objects.filter(event_id=event.id).values('distance_id')
             )
 
+        if user:
+            # Pre-fill fields if the user has an associated participant record
+            participant = Participant.objects.filter(user=user).first()
+            if participant:
+                for field in self.fields:
+                    if hasattr(participant, field):
+                        self.fields[field].initial = getattr(participant, field)
 
-    #
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = [
+            'first_name', 'last_name', 'date_of_birth', 'gender', 'email',
+            'country', 'city', 'club', 'shirt_size', 'phone_number',
+        ]
 
-    def clean_shirt_number(self):
+def clean_shirt_number(self):
         shirt_number = self.cleaned_data.get('shirt_number')
         if shirt_number == '':
             return None

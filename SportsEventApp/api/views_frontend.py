@@ -1,19 +1,25 @@
 import os
 from datetime import date
-
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from paypalrestsdk import Payment
 from django.http import HttpResponseRedirect, HttpResponse
 from .paypal_config import paypalrestsdk
 from django.urls import reverse
-from api.forms import ParticipantForm
+from api.forms import ParticipantForm, UserProfileForm
 from api.models import Event, Distance, DistanceParticipantAssociation, GroupParticipantAssociation, \
-    EventParticipantAssociation, Participant
+    EventParticipantAssociation, Participant, UserEventDistance
 from django.conf import settings
 import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django import forms
 from api.views import get_next_available_number
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import UserProfile
 
 
 def event_list(request):
@@ -56,13 +62,20 @@ LABEL_TO_FIELD = {
     "Distancija": "distance",
 }
 
+@login_required
 def participant_register(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    profile = request.user.profile
 
     event_config = event.required_participant_fields if event else "{}"
     config_dict = json.loads(event_config)
 
-    form = ParticipantForm(request.POST or None, event=event)
+    # Get participant for authenticated user, if any
+    participant = None
+    if request.user.is_authenticated:
+        participant = Participant.objects.filter(user=request.user).first()
+
+    form = ParticipantForm(request.POST or None, event=event, user=request.user, instance=participant)
 
     # Dynamically hide fields based on the event's configuration
     for label, field_name in LABEL_TO_FIELD.items():
@@ -75,8 +88,16 @@ def participant_register(request, event_id):
     if form.is_valid():
         participant = form.save(commit=False)  # Don't save to DB yet
 
+        # Link the participant to the logged-in user (if any)
+        if request.user.is_authenticated:
+            participant.user = request.user  # Associate participant with user
+
         # Register participant with if_paid as False
         participant.if_paid = False  # Initially set to False
+
+        # Handle empty shirt_number
+        if not participant.shirt_number:
+            participant.shirt_number = None
 
         participant.save()  # Save the participant now
 
@@ -90,6 +111,14 @@ def participant_register(request, event_id):
 
         if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
             DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
+
+        # Create or update UserEventDistance entry
+        if request.user.is_authenticated:
+            UserEventDistance.objects.get_or_create(
+                participant=participant,
+                event=event,
+                distance=selected_distance
+            )
 
         # Calculate the participant's age
         today = date.today()
@@ -305,4 +334,78 @@ def privacy_policy(request):
 def contact(request):
     return render(request, 'frontend/contacts.html')
 
+@login_required
+def user_events(request):
+    user_event_distances = UserEventDistance.objects.filter(user=request.user)
 
+    return render(request, 'frontend/user_events.html', {'user_event_distances': user_event_distances})
+
+class UserLoginView(LoginView):
+    template_name = 'frontend/user_login.html'
+
+    def get_success_url(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return '/admin/'  # Redirect admins to the admin panel
+        return super().get_success_url()  # Redirect normal users to their default page
+
+def user_register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            return redirect('login')  # Redirect to login page after successful registration
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'frontend/register.html', {'form': form})
+
+class CustomLoginView(LoginView):
+    def get_success_url(self):
+        # Redirect admins to /events/, normal users to /events-front/
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return '/events/'
+        return '/events-front/'
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+@login_required
+def edit_profile(request):
+    user = request.user
+
+    # Check if the profile exists for the user; if not, create it
+    if not hasattr(user, 'profile'):
+        UserProfile.objects.create(user=user)
+
+    profile = user.profile  # Get the user's profile
+
+    if request.method == 'POST':
+        # Handle the form submission to update the profile
+        profile.first_name = request.POST.get('first_name')
+        profile.last_name = request.POST.get('last_name')
+        profile.date_of_birth = request.POST.get('date_of_birth')
+        profile.gender = request.POST.get('gender')
+        profile.email = request.POST.get('email')
+        profile.country = request.POST.get('country')
+        profile.city = request.POST.get('city')
+        profile.club = request.POST.get('club')
+        profile.shirt_size = request.POST.get('shirt_size')
+        profile.phone_number = request.POST.get('phone_number')
+        profile.save()
+
+        return redirect('profile')  # Redirect to the profile page after saving
+
+    return render(request, 'frontend/edit_profile.html', {'profile': profile})
+
+@login_required
+def profile_view(request, user_id):
+    # Retrieve the user by the provided user_id
+    user = get_object_or_404(User, id=user_id)
+    # Pass the user object to the template
+    return render(request, 'frontend/profile.html', {'user': user})

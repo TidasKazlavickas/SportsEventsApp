@@ -471,3 +471,46 @@ header {
     font-weight: bold;
     margin-left: 2px;
 }
+
+/* Styles for authentication buttons */
+.auth-buttons {
+    margin: 10px 0;
+    text-align: right;
+}
+
+.auth-btn {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Specific styles for each button */
+.login-btn {
+    color: white;
+    background-color: blue;
+}
+
+.login-btn:hover {
+    background-color: darkblue;
+}
+
+.register-btn {
+    color: white;
+    background-color: green;
+}
+
+.register-btn:hover {
+    background-color: darkgreen;
+}
+
+.logout-btn {
+    color: white;
+    background-color: red;
+}
+
+.logout-btn:hover {
+    background-color: darkred;
+}
