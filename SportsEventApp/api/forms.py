@@ -142,10 +142,9 @@ class ParticipantForm(forms.ModelForm):
             'distance': forms.Select(),
         }
 
-    # Dynamically update the distance field based on the selected event and pre-fill for logged-in users
     def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event', None)  # Event to filter distances
-        user = kwargs.pop('user', None)  # User to pre-fill fields
+        event = kwargs.pop('event', None)  # Get the event from kwargs
+        user = kwargs.pop('user', None)  # Get the user from kwargs
         super().__init__(*args, **kwargs)
 
         if event:
@@ -161,6 +160,7 @@ class ParticipantForm(forms.ModelForm):
                 for field in self.fields:
                     if hasattr(participant, field):
                         self.fields[field].initial = getattr(participant, field)
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
