@@ -70,9 +70,10 @@ def participant_register(request, event_id):
     # Get participant for authenticated user, if any
     participant = None
     if request.user.is_authenticated:
+        # Check if the user has a profile, and fetch the participant associated with the user
         participant = Participant.objects.filter(user=request.user).first()
 
-    # Initialize form (pass user for auto-filling fields)
+    # Initialize the form with the event and user profile (if any)
     form = ParticipantForm(request.POST or None, event=event, user=request.user if request.user.is_authenticated else None, instance=participant)
 
     # Dynamically hide fields based on the event's configuration
@@ -113,7 +114,7 @@ def participant_register(request, event_id):
         # Create or update UserEventDistance entry (only for authenticated users)
         if request.user.is_authenticated:
             UserEventDistance.objects.get_or_create(
-                participant=participant,
+                user=request.user,
                 event=event,
                 distance=selected_distance
             )
@@ -336,10 +337,11 @@ def contact(request):
 
 @login_required
 def user_events(request):
-    # Get all UserEventDistance records associated with the logged-in user's participant
-    user_event_distances = UserEventDistance.objects.filter(participant__user=request.user)
+    # Get all UserEventDistance records associated with the logged-in user
+    user_event_distances = UserEventDistance.objects.filter(user=request.user)
 
     return render(request, 'frontend/user_events.html', {'user_event_distances': user_event_distances})
+
 
 
 class UserLoginView(LoginView):

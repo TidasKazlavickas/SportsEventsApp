@@ -29,7 +29,17 @@
                             {% endif %}
                         </label>
                     </td>
-                    <td>{{ field }}</td>
+                    <td>
+                        {% if field.name == "gender" %}
+                            <select name="gender" id="{{ field.id_for_label }}">
+                                <option value="male" {% if field.initial == 'male' %}selected{% endif %}>Vyras</option>
+                                <option value="female" {% if field.initial == 'female' %}selected{% endif %}>Moteris</option>
+                                <option value="other" {% if field.initial == 'other' %}selected{% endif %}>Kita</option>
+                            </select>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    </td>
                 </tr>
             {% endif %}
         {% endfor %}
