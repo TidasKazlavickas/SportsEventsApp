@@ -12,7 +12,7 @@
 
 <div class="auth-buttons">
     {% if user.is_authenticated %}
-        <p>Sveiki, <a href="{% url 'user_profile' user.id %}">{{ user.username }}</a>!</p>
+        <p>Sveiki, <a href="{% url 'user_profile' user_id=user.id %}">{{ user.username }}</a>!</p>
         <a href="{% url 'logout' %}" class="auth-btn logout-btn">Atsijungti</a>
     {% else %}
         <a href="{% url 'login' %}" class="auth-btn login-btn">Prisijungti</a>

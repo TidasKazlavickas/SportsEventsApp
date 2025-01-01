@@ -398,21 +398,14 @@ def edit_profile(request):
 
     if request.method == 'POST':
         # Handle the form submission to update the profile
-        profile.first_name = request.POST.get('first_name')
-        profile.last_name = request.POST.get('last_name')
-        profile.date_of_birth = request.POST.get('date_of_birth')
-        profile.gender = request.POST.get('gender')
-        profile.email = request.POST.get('email')
-        profile.country = request.POST.get('country')
-        profile.city = request.POST.get('city')
-        profile.club = request.POST.get('club')
-        profile.shirt_size = request.POST.get('shirt_size')
-        profile.phone_number = request.POST.get('phone_number')
-        profile.save()
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile', user_id=user.id)  # Redirect to the profile page
+    else:
+        form = UserProfileForm(instance=profile)
 
-        return redirect('profile')  # Redirect to the profile page after saving
-
-    return render(request, 'frontend/edit_profile.html', {'profile': profile})
+    return render(request, 'frontend/edit_profile.html', {'form': form, 'profile': profile})
 
 @login_required
 def profile_view(request, user_id):

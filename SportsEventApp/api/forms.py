@@ -165,10 +165,23 @@ class ParticipantForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = [
-            'first_name', 'last_name', 'date_of_birth', 'gender', 'email',
-            'country', 'city', 'club', 'shirt_size', 'phone_number',
-        ]
+        fields = ['first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'country', 'city', 'club', 'shirt_size', 'phone_number']
+        labels = {
+            'first_name': 'Vardas',
+            'last_name': 'Pavardė',
+            'date_of_birth': 'Gimimo data',
+            'gender': 'Lytis',
+            'email': 'El. paštas',
+            'country': 'Valstybė',
+            'city': 'Miestas',
+            'club': 'Klubas',
+            'shirt_size': 'Marškinėlių dydis',
+            'phone_number': 'Telefonas',
+        }
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'gender': forms.Select(choices=[('male', 'Vyras'), ('female', 'Moteris'), ('other', 'Kita')]),
+        }
 
 def clean_shirt_number(self):
         shirt_number = self.cleaned_data.get('shirt_number')

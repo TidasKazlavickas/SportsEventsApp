@@ -162,17 +162,17 @@ class UserEventDistance(models.Model):
         unique_together = ('user', 'event', 'distance')
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # One-to-one relation with User model
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10)
-    email = models.EmailField(max_length=255)
-    country = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    club = models.CharField(max_length=100)
-    shirt_size = models.CharField(max_length=10)
-    phone_number = models.CharField(max_length=15)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')  # One-to-one relation with User model
+    first_name = models.CharField(max_length=100, db_column='first_name')
+    last_name = models.CharField(max_length=100, db_column='last_name')
+    date_of_birth = models.DateField(db_column='date_of_birth')
+    gender = models.CharField(max_length=10, db_column='gender')
+    email = models.EmailField(max_length=255, db_column='email')
+    country = models.CharField(max_length=100, db_column='country')
+    city = models.CharField(max_length=100, db_column='city')
+    club = models.CharField(max_length=100, db_column='club')
+    shirt_size = models.CharField(max_length=10, db_column='shirt_size')
+    phone_number = models.CharField(max_length=15, db_column='phone_number')
 
     class Meta:
         db_table = 'user_profile'

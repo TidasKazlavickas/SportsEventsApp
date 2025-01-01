@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Your Profile</h1>
+    <h1>Jūsų profilis</h1>
     <p><strong>Vardas:</strong> {{ user.profile.first_name }}</p>
     <p><strong>Pavardė:</strong> {{ user.profile.last_name }}</p>
     <p><strong>Gimimo data:</strong> {{ user.profile.date_of_birth }}</p>
@@ -11,5 +11,6 @@
     <p><strong>Klubas:</strong> {{ user.profile.club }}</p>
     <p><strong>Marškinėlių dydis:</strong> {{ user.profile.shirt_size }}</p>
     <p><strong>Telefono numeris:</strong> {{ user.profile.phone_number }}</p>
-    <a href="{% url 'edit_profile' %}">Edit Profile</a>
+    <a href="{% url 'edit_profile' %}">Redaguoti profilį</a>
+    <a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
 {% endblock %}
