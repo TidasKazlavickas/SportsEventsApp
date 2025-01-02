@@ -215,9 +215,6 @@
 <nav>
     {% if user.is_authenticated %}
         <button class="logout-button" onclick="location.href='{% url 'logout' %}'">Atsijungti</button>
-    {% else %}
-        <a href="{% url 'login' %}" class="form-button">Prisijungti</a>
-        <a href="{% url 'register' %}" class="form-button">Registruotis</a>
     {% endif %}
 </nav>
 
