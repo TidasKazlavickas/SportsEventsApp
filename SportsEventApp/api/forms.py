@@ -173,7 +173,6 @@ class ParticipantForm(forms.ModelForm):
             self.fields['gender'].initial = user_profile.gender
             self.fields['date_of_birth'].initial = user_profile.date_of_birth
 
-            print("Gender initial:", self.fields['gender'].initial)
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

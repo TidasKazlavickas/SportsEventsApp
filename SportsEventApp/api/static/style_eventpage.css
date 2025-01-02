@@ -17,9 +17,23 @@ a {
     text-decoration: none;
     font-weight: bold;
 }
-
 a:hover {
-    text-decoration: underline;
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly enlarge the button */
+}
+
+/* Focus effect */
+a:focus {
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.6); /* Add a glowing effect when focused */
+}
+
+/* Responsive styling for small screens */
+@media (max-width: 768px) {
+    a {
+        padding: 10px 20px; /* Adjust padding for smaller screens */
+        font-size: 1em; /* Slightly reduce font size */
+    }
 }
 
 /* Event List Page Styles */
@@ -145,7 +159,7 @@ form label {
 }
 
 form input[type="text"], form input[type="email"], form select, form textarea {
-    width: 100%;
+    width: 80%;
     padding: 10px;
     margin: 5px 0 15px 0;
     border-radius: 4px;
@@ -490,11 +504,11 @@ header {
 /* Specific styles for each button */
 .login-btn {
     color: white;
-    background-color: blue;
+    background-color: green;
 }
 
 .login-btn:hover {
-    background-color: darkblue;
+    background-color: darkgreen;
 }
 
 .register-btn {
@@ -513,4 +527,29 @@ header {
 
 .logout-btn:hover {
     background-color: darkred;
+}
+
+.auto-filled-message {
+    color: green; /* Green text */
+    font-size: 1.5em; /* Make the text a bit bigger */
+    text-align: center; /* Center the text */
+    width: 100%; /* Ensure it spans the entire width */
+}
+
+.profile-return-button {
+    display: inline-block; /* Ensure it behaves like a button */
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px; /* Increase font size */
+    padding: 15px 30px; /* Add padding for a larger appearance */
+    text-align: center;
+    text-decoration: none; /* Remove underline */
+    border-radius: 8px; /* Add rounded corners */
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.profile-return-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
 }
