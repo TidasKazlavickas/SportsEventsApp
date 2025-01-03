@@ -96,14 +96,14 @@ class ParticipantForm(forms.ModelForm):
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=range(1900, 2025)), required=True)
     email = forms.EmailField(required=True)
     city = forms.CharField(max_length=100, required=True)
-    club = forms.CharField(max_length=100, required=False)
+    club = forms.CharField(max_length=100, required=True)
     shirt_size = forms.CharField(max_length=10, required=True)
     phone_number = forms.CharField(max_length=15, required=True)
     comment = forms.CharField(widget=forms.Textarea, required=False)
     if_paid = forms.BooleanField(required=False)
     if_number_received = forms.BooleanField(required=False)
     if_shirt_received = forms.BooleanField(required=False)
-    shirt_number = forms.CharField(max_length=10, required=False)
+    shirt_number = forms.CharField(max_length=10, required=False)  # New field for Shirt Number
 
     # Allow free text input for country
     country = forms.CharField(max_length=100, required=True)
@@ -161,19 +161,6 @@ class ParticipantForm(forms.ModelForm):
                     if hasattr(participant, field):
                         self.fields[field].initial = getattr(participant, field)
 
-            user_profile = user.profile
-            self.fields['first_name'].initial = user_profile.first_name
-            self.fields['last_name'].initial = user_profile.last_name
-            self.fields['email'].initial = user_profile.email
-            self.fields['city'].initial = user_profile.city
-            self.fields['club'].initial = user_profile.club
-            self.fields['shirt_size'].initial = user_profile.shirt_size
-            self.fields['phone_number'].initial = user_profile.phone_number
-            self.fields['country'].initial = user_profile.country
-            self.fields['gender'].initial = user_profile.gender
-            self.fields['date_of_birth'].initial = user_profile.date_of_birth
-
-            print("Gender initial:", self.fields['gender'].initial)
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

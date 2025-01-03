@@ -70,10 +70,9 @@ def participant_register(request, event_id):
     # Get participant for authenticated user, if any
     participant = None
     if request.user.is_authenticated:
-        # Check if the user has a profile, and fetch the participant associated with the user
         participant = Participant.objects.filter(user=request.user).first()
 
-    # Initialize the form with the event and user profile (if any)
+    # Initialize form (pass user for auto-filling fields)
     form = ParticipantForm(request.POST or None, event=event, user=request.user if request.user.is_authenticated else None, instance=participant)
 
     # Dynamically hide fields based on the event's configuration
@@ -114,7 +113,7 @@ def participant_register(request, event_id):
         # Create or update UserEventDistance entry (only for authenticated users)
         if request.user.is_authenticated:
             UserEventDistance.objects.get_or_create(
-                user=request.user,
+                participant=participant,
                 event=event,
                 distance=selected_distance
             )
@@ -337,11 +336,10 @@ def contact(request):
 
 @login_required
 def user_events(request):
-    # Get all UserEventDistance records associated with the logged-in user
-    user_event_distances = UserEventDistance.objects.filter(user=request.user)
+    # Get all UserEventDistance records associated with the logged-in user's participant
+    user_event_distances = UserEventDistance.objects.filter(participant__user=request.user)
 
     return render(request, 'frontend/user_events.html', {'user_event_distances': user_event_distances})
-
 
 
 class UserLoginView(LoginView):
@@ -370,23 +368,14 @@ class CustomLoginView(LoginView):
             return '/events/'
         return '/events-front/'
 
-    def form_valid(self, form):
-        # Ensure a UserProfile is created if it doesn't exist for the user
-        if not hasattr(self.request.user, 'profile'):
-            UserProfile.objects.create(user=self.request.user)
-        return super().form_valid(form)
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
 
-def save_user_profile(user):
-    if not hasattr(user, 'profile'):
-        user_profile = UserProfile.objects.create(user=user)
-    else:
-        user_profile = user.profile
-    return user_profile
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
 
 @login_required
 def edit_profile(request):
