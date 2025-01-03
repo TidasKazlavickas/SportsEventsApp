@@ -48,7 +48,7 @@ urlpatterns = [
     path('logout/', custom_logout, name='logout'),
     path('register/', user_register, name='register'),
     path('admin/', admin.site.urls),
-    path('profile/edit/', views_frontend.edit_profile, name='edit_profile'),
+    path('profile/edit/', edit_profile, name='edit_profile'),
     path('profile/<int:user_id>/', views_frontend.profile_view, name='user_profile'),
 ]
 
