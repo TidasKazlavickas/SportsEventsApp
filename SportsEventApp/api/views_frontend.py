@@ -370,14 +370,23 @@ class CustomLoginView(LoginView):
             return '/events/'
         return '/events-front/'
 
+    def form_valid(self, form):
+        # Ensure a UserProfile is created if it doesn't exist for the user
+        if not hasattr(self.request.user, 'profile'):
+            UserProfile.objects.create(user=self.request.user)
+        return super().form_valid(form)
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+def save_user_profile(user):
+    if not hasattr(user, 'profile'):
+        user_profile = UserProfile.objects.create(user=user)
+    else:
+        user_profile = user.profile
+    return user_profile
 
 @login_required
 def edit_profile(request):
