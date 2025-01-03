@@ -1,31 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Jūsų profilis</h1>
-    <div class="profile-fields-container">
-        <p><strong>Vardas:</strong> {{ user.profile.first_name }}</p>
-        <p><strong>Pavardė:</strong> {{ user.profile.last_name }}</p>
-        <p><strong>Gimimo data:</strong> {{ user.profile.date_of_birth }}</p>
-        <p><strong>Lytis:</strong>
-            {% if user.profile.gender == 'male' %}
-                Vyras
-            {% elif user.profile.gender == 'female' %}
-                Moteris
-            {% elif user.profile.gender == 'other' %}
-                Kita
-            {% else %}
-                Nenurodyta
-            {% endif %}
-        </p>
-        <p><strong>Elektroninis paštas:</strong> {{ user.profile.email }}</p>
-        <p><strong>Šalis:</strong> {{ user.profile.country }}</p>
-        <p><strong>Miestas:</strong> {{ user.profile.city }}</p>
-        <p><strong>Klubas:</strong> {{ user.profile.club }}</p>
-        <p><strong>Marškinėlių dydis:</strong> {{ user.profile.shirt_size }}</p>
-        <p><strong>Telefono numeris:</strong> {{ user.profile.phone_number }}</p>
-    </div>
-    <div class="button-container">
-        <a href="{% url 'edit_profile' %}" class="form-button">Redaguoti profilį</a>
-        <a href="{% url 'my_events' %}" class="form-button">Mano renginiai</a>
-        <a href="{% url 'events' %}" class="form-button">Grįžti į renginių sąrašą</a>
-    </div>
+    <p><strong>Vardas:</strong> {{ user.profile.first_name }}</p>
+    <p><strong>Pavardė:</strong> {{ user.profile.last_name }}</p>
+    <p><strong>Gimimo data:</strong> {{ user.profile.date_of_birth }}</p>
+    <p><strong>Lytis:</strong> {{ user.profile.gender }}</p>
+    <p><strong>Elektroninis paštas:</strong> {{ user.profile.email }}</p>
+    <p><strong>Šalis:</strong> {{ user.profile.country }}</p>
+    <p><strong>Miestas:</strong> {{ user.profile.city }}</p>
+    <p><strong>Klubas:</strong> {{ user.profile.club }}</p>
+    <p><strong>Marškinėlių dydis:</strong> {{ user.profile.shirt_size }}</p>
+    <p><strong>Telefono numeris:</strong> {{ user.profile.phone_number }}</p>
+    <a href="{% url 'edit_profile' %}">Redaguoti profilį</a>
+    <a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
 {% endblock %}

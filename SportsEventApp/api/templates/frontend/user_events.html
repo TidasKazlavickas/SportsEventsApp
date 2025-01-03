@@ -4,16 +4,15 @@
 <link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 {% block content %}
     <h1>Mano renginiai</h1>
-    <ul class="event-list">
+    <ul>
         {% for entry in user_event_distances %}
             <li>
-                <p><strong>Renginys:</strong> {{ entry.event.name }}</p>
-                <p><strong>Distancija:</strong> {{ entry.distance.name_lt }}</p>
-                <p><strong>Data:</strong> {{ entry.event.event_date }}</p>
+                Renginys: {{ entry.event.name }}<br>
+                Distancija: {{ entry.distance.name_lt }}<br>
+                Data: {{ entry.event.event_date }}
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'user_profile' user_id=user.id %}" class="profile-return-button">Grįžti į profilį</a>
+    <a href="{% url 'user_profile' user_id=user.id %}">Grįžti į profilį</a>
 {% endblock %}
-
 

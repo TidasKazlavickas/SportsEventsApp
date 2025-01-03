@@ -1,60 +1,51 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="lt">
+<link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 <head>
     <meta charset="UTF-8">
     <title>Registracija | Sporto Renginiai</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 </head>
 <body>
 <h1>Registracija į: {{ event.name }}</h1>
 
 {% if user.is_authenticated %}
-    <p class="auto-filled-message">Jūsų duomenys buvo užpildyti automatiškai pagal ankstesnes registracijas.</p>
+    <p>Jūsų duomenys buvo užpildyti automatiškai pagal ankstesnes registracijas.</p>
 {% endif %}
 
 <form method="post">
     {% csrf_token %}
-    <div class="add-participant-form-container">
-        <table>
-            {% for field in form %}
-                {% if field.field.required %}
-                    <tr>
-                        <td>
-                            <label for="{{ field.id_for_label }}">
-                                {% if field.name == 'first_name' %}
-                                    Vardas
-                                {% elif field.name == 'last_name' %}
-                                    Pavardė
-                                {% elif field.name == 'date_of_birth' %}
-                                    Gimimo data
-                                {% elif field.name == 'email' %}
-                                    El. paštas
-                                {% elif field.name == 'country' %}
-                                    Valstybė
-                                {% elif field.name == 'city' %}
-                                    Miestas
-                                {% elif field.name == 'shirt_size' %}
-                                    Marškinėlių dydis
-                                {% elif field.name == 'gender' %}
-                                    Lytis
-                                {% elif field.name == 'distance' %}
-                                    Distancija
-                                {% endif %}
-                                {% if field.field.required %}
-                                    <span style="color: red;">*</span>
-                                {% endif %}
-                            </label>
-                        </td>
-                        <td>{{ field }}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        </table>
-    </div>
+    <table>
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                <tr>
+                    <td>
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span style="color: red;">*</span>
+                            {% endif %}
+                        </label>
+                    </td>
+                    <td>
+                        {% if field.name == "gender" %}
+                            <select name="gender" id="{{ field.id_for_label }}">
+                                <option value="male" {% if field.initial == 'male' %}selected{% endif %}>Vyras</option>
+                                <option value="female" {% if field.initial == 'female' %}selected{% endif %}>Moteris</option>
+                                <option value="other" {% if field.initial == 'other' %}selected{% endif %}>Kita</option>
+                            </select>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
     <button type="submit">Registruotis</button>
 </form>
-
 <a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
 </body>
 </html>

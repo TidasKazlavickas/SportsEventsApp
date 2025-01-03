@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Profilio redagavimas</h1>
-    <form method="post" class="edit-profile-form">
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Išsaugoti pakeitimus</button>
     </form>
 
-    <a href="{% url 'user_profile' user_id=user.id %}" class="profile-return-button">Grįžti į profilį</a>
-
+    <a href="{% url 'user_profile' user_id=user.id %}">Grįžti į profilį</a>
 {% endblock %}
