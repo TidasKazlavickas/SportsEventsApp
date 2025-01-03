@@ -87,7 +87,7 @@ class Participant(models.Model):
     if_number_received = models.BooleanField(default=False, db_column='If_number_received')
     if_shirt_received = models.BooleanField(default=False, db_column='If_shirt_received')
     registration_date = models.DateField(auto_now_add=True, db_column='Registration_date')
-    shirt_number = models.IntegerField(db_column='Shirt_number')
+    shirt_number = models.IntegerField(db_column='Shirt_number', null=True, blank=True)
 
     # Many-to-many relationships via custom association tables
     events = models.ManyToManyField(Event, through='EventParticipantAssociation')

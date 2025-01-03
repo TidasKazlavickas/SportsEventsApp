@@ -369,13 +369,20 @@ def add_participant(request, event_id):
     if request.method == 'POST':
         form = ParticipantForm(request.POST, event=event)
         if form.is_valid():
-            participant = form.save()
+            participant = form.save(commit=False)  # Do not save to DB yet
 
+            # Handle empty shirt_number by setting it to None
+            if not participant.shirt_number:
+                participant.shirt_number = None
+
+            participant.save()  # Save to DB
+
+            # Create Event-Participant Association
             if not EventParticipantAssociation.objects.filter(event=event, participant=participant).exists():
                 EventParticipantAssociation.objects.create(event=event, participant=participant)
 
+            # Process selected distance
             selected_distance_id = request.POST.get('distance')
-
             selected_distance = get_object_or_404(Distance, id=selected_distance_id)
 
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
@@ -386,10 +393,7 @@ def add_participant(request, event_id):
             age = today.year - participant.date_of_birth.year - ((today.month, today.day) < (participant.date_of_birth.month, participant.date_of_birth.day))
 
             groups = selected_distance.groups.all()
-
-            eligible_groups = [
-                group for group in groups if group.gender.lower() == participant.gender.lower()
-            ]
+            eligible_groups = [group for group in groups if group.gender.lower() == participant.gender.lower()]
 
             closest_group = None
             smallest_age_diff = None
@@ -412,7 +416,7 @@ def add_participant(request, event_id):
                 GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
 
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
-            if request.POST.get('if_paid') == 'on' and (not form.cleaned_data.get('shirt_number')):
+            if request.POST.get('if_paid') == 'on' and participant.shirt_number is None:
                 next_available_number = get_next_available_number(selected_distance)
 
                 # Only assign if a valid number is available
