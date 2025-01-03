@@ -98,7 +98,7 @@ a:focus {
     display: inline-block; /* Makes links behave like inline elements but allows for block styling */
     margin: 5px; /* Adds spacing between the links */
     text-decoration: none;
-    color: green;
+    color: #007BFF;
     font-size: 14px;
 }
 

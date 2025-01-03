@@ -30,7 +30,7 @@
 </form>
 
 <!-- Event List -->
-<ul class="event-list-api">
+<ul>
     {% for event in events %}
         <li>
             <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>

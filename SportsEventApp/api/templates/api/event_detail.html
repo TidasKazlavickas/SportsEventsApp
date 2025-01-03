@@ -175,11 +175,7 @@
                 <td>{{ participant.phone_number }}</td>
                 <td>
                     <!-- Delete Button -->
-                    <a href="{% url 'delete_participant' participant.id %}"
-                       class="delete-button-red"
-                       onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">
-                        Ištrinti
-                    </a>
+                    <a href="{% url 'delete_participant' participant.id %}" onclick="return confirm('Ar tikrai norite ištrinti šį dalyvį?');">Ištrinti</a>
                 </td>
 
             </tr>

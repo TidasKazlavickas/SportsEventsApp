@@ -266,7 +266,7 @@ form > div {
 
 .add-participant-form-container td input,
 .add-participant-form-container td select {
-    width: 80%; /* Ensures form elements take up full width */
+    width: 100%; /* Ensures form elements take up full width */
     padding: 5px; /* Reduces padding inside form elements */
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -311,52 +311,4 @@ form > div {
 
 .logout-button:hover, .login-button:hover {
     background-color: darkred;
-}
-
-.event-list-api {
-    list-style-type: none; /* Remove default bullet points */
-    padding: 0;
-    margin: 20px;
-    max-width: 700px; /* Limit width */
-}
-
-.event-list-api li {
-    background-color: #f9f9f9; /* Light background for each event */
-    border: 1px solid #ddd; /* Subtle border around each event */
-    border-radius: 8px; /* Rounded corners */
-    margin-bottom: 15px; /* Spacing between events */
-    padding: 15px; /* Add padding inside each event box */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add slight shadow for depth */
-    font-size: 20px; /* Larger font size for event names */
-    text-align: left; /* Align text to the left */
-    display: flex; /* Use flexbox for symbol and text */
-    align-items: center; /* Vertically align content */
-}
-
-.event-list-api li::before {
-    content: "●"; /* Add a circle symbol */
-    color: #4CAF50; /* Color of the circle */
-    font-size: 18px; /* Size of the circle */
-    margin-right: 10px; /* Space between circle and text */
-}
-
-.event-list-api li a {
-    text-decoration: none; /* Remove underline from links */
-    color: #4CAF50; /* Highlighted color for event names */
-    font-weight: bold; /* Make event names bold */
-}
-
-.event-list-api li a:hover {
-    color: #45a049; /* Darker green on hover */
-    text-decoration: underline; /* Add underline on hover */
-}
-
-.delete-button-red {
-    color: red; /* Make the text red */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold; /* Optional: Make the text bold */
-}
-
-.delete-button-red:hover {
-    text-decoration: underline; /* Add underline on hover */
 }

@@ -12,7 +12,7 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ event_form.as_p }}
-    <button type="submit" name="submit_event">Pridėti renginį</button>
+    <button type="submit" name="submit_event">Submit Event</button>
 </form>
 <h2>Grupės:</h2>
 <form method="post">
@@ -38,7 +38,7 @@
             });
         });
     </script>
-    <button type="submit" name="submit_group">Pridėti grupę</button>
+    <button type="submit" name="submit_group">Pridėti</button>
 </form>
 <h3>Sukurtos grupės:</h3>
 <table border="1">
@@ -61,7 +61,7 @@
 <form method="post">
     {% csrf_token %}
     {{ distance_form.as_p }}
-    <button type="submit" name="submit_distance">Pridėti distanciją</button>
+    <button type="submit" name="submit_distance">Submit Distance</button>
 </form>
 <a href="{% url 'event_list' %}">Atšaukti ir grįžti į renginių sąrašą</a>
 </body>
