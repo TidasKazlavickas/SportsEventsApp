@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 {% block content %}
@@ -13,6 +12,4 @@
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'user_profile' user_id=user.id %}">Grįžti į profilį</a>
 {% endblock %}
-

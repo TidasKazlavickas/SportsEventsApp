@@ -9,9 +9,9 @@ from paypalrestsdk import Payment
 from django.http import HttpResponseRedirect, HttpResponse
 from .paypal_config import paypalrestsdk
 from django.urls import reverse
-from api.forms import ParticipantForm, UserProfileForm
+from api.forms import ParticipantForm
 from api.models import Event, Distance, DistanceParticipantAssociation, GroupParticipantAssociation, \
-    EventParticipantAssociation, Participant, UserEventDistance
+    EventParticipantAssociation, Participant
 from django.conf import settings
 import json
 from django.shortcuts import render, get_object_or_404, redirect
@@ -19,7 +19,6 @@ from django import forms
 from api.views import get_next_available_number
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import UserProfile
 
 
 def event_list(request):
@@ -62,8 +61,11 @@ LABEL_TO_FIELD = {
     "Distancija": "distance",
 }
 
+@login_required
 def participant_register(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    profile = request.user.profile
+
     event_config = event.required_participant_fields if event else "{}"
     config_dict = json.loads(event_config)
 
@@ -72,8 +74,7 @@ def participant_register(request, event_id):
     if request.user.is_authenticated:
         participant = Participant.objects.filter(user=request.user).first()
 
-    # Initialize form (pass user for auto-filling fields)
-    form = ParticipantForm(request.POST or None, event=event, user=request.user if request.user.is_authenticated else None, instance=participant)
+    form = ParticipantForm(request.POST or None, event=event, user=request.user, instance=participant)
 
     # Dynamically hide fields based on the event's configuration
     for label, field_name in LABEL_TO_FIELD.items():
@@ -110,7 +111,7 @@ def participant_register(request, event_id):
         if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
             DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
-        # Create or update UserEventDistance entry (only for authenticated users)
+        # Create or update UserEventDistance entry
         if request.user.is_authenticated:
             UserEventDistance.objects.get_or_create(
                 participant=participant,
@@ -148,8 +149,6 @@ def participant_register(request, event_id):
         return redirect('payment_options', participant_id=participant.id, event_id=event.id, selected_distance=selected_distance.id)
 
     return render(request, 'frontend/add_participant.html', {'form': form, 'event': event})
-
-
 
 
 def participant_list(request, event_id):
@@ -336,11 +335,9 @@ def contact(request):
 
 @login_required
 def user_events(request):
-    # Get all UserEventDistance records associated with the logged-in user's participant
-    user_event_distances = UserEventDistance.objects.filter(participant__user=request.user)
+    user_event_distances = UserEventDistance.objects.filter(user=request.user)
 
     return render(request, 'frontend/user_events.html', {'user_event_distances': user_event_distances})
-
 
 class UserLoginView(LoginView):
     template_name = 'frontend/user_login.html'

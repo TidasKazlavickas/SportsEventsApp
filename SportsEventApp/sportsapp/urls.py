@@ -1,13 +1,9 @@
 from django.urls import path
 from api import views, views_frontend
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import views as auth_views, login
 from django.conf import settings
 from django.conf.urls.static import static
-from api.views import custom_logout
-from api.views_frontend import UserLoginView, user_register, edit_profile, profile_view
-from api.admin_custom import CustomAdminSite
-from django.contrib import admin
-
+from api.views import custom_logout, upload_participants
 
 urlpatterns = [
     # Back-end URLs
@@ -23,7 +19,7 @@ urlpatterns = [
     path('event/<int:event_id>/export_participants_csv/', views.export_participants_csv, name='export_participants_csv'),
     path('event/<int:event_id>/export_all_participants_csv/', views.export_all_participants_csv, name='export_all_participants_csv'),
     path('event/<int:event_id>/add_participant/', views.add_participant, name='add_participant'),
-    path('admin/login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='admin_login'),
+    path('login/', auth_views.LoginView.as_view(template_name='api/login.html'), name='login'),
     path('logout/', custom_logout, name='logout'),
     path('event/<int:event_id>/add_results/', views.add_event_results, name='add_event_results'),
     path('event/<int:event_id>/upload_photos/', views.upload_event_photos, name='upload_event_photos'),
@@ -43,13 +39,6 @@ urlpatterns = [
     path('apie-mus/', views_frontend.about_us, name='about_us'),
     path('privatumo-politika/', views_frontend.privacy_policy, name='privacy_policy'),
     path('kontaktai/', views_frontend.contact, name='contact'),
-    path('my-events/', views_frontend.user_events, name='my_events'),
-    path('login/', UserLoginView.as_view(), name='login'),
-    path('logout/', custom_logout, name='logout'),
-    path('register/', user_register, name='register'),
-    path('admin/', admin.site.urls),
-    path('profile/edit/', edit_profile, name='edit_profile'),
-    path('profile/<int:user_id>/', views_frontend.profile_view, name='user_profile'),
 ]
 
 if settings.DEBUG:
