@@ -174,8 +174,5 @@ class UserProfile(models.Model):
     shirt_size = models.CharField(max_length=10, db_column='shirt_size')
     phone_number = models.CharField(max_length=15, db_column='phone_number')
 
-    class Meta:
-        db_table = 'user_profile'
-
     def __str__(self):
         return f'{self.user.username} Profile'
