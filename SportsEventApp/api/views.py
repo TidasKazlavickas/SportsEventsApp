@@ -413,7 +413,7 @@ def add_participant(request, event_id):
                         closest_group = group
 
             if closest_group:
-                GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
+                GroupParticipantAssociation.objects.get_or_create(group=closest_group, participant=participant)
 
             # Check if 'if_paid' is selected, and if no shirt number is entered, assign one
             if request.POST.get('if_paid') == 'on' and participant.shirt_number is None:
@@ -744,7 +744,7 @@ def upload_participants(request, event_id):
                             closest_group = group
 
                 if closest_group:
-                    GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
+                    GroupParticipantAssociation.objects.get_or_create(group=closest_group, participant=participant)
 
                 next_available_number = get_next_available_number(selected_distance)
 

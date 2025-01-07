@@ -143,7 +143,7 @@ def participant_register(request, event_id):
                     closest_group = group
 
         if closest_group:
-            GroupParticipantAssociation.objects.create(group=closest_group, participant=participant)
+            GroupParticipantAssociation.objects.get_or_create(group=closest_group, participant=participant)
 
         # Redirect to the payment options page or simulate payment if necessary
         return redirect('payment_options', participant_id=participant.id, event_id=event.id, selected_distance=selected_distance.id)
