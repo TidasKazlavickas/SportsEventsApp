@@ -10,6 +10,8 @@ from api.admin_custom import CustomAdminSite
 from django.contrib import admin
 
 
+custom_admin_site = CustomAdminSite(name='custom_admin')
+
 urlpatterns = [
     # Back-end URLs
     path('', views_frontend.event_list, name='events'),
@@ -49,7 +51,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', custom_logout, name='logout'),
     path('register/', user_register, name='register'),
-    path('admin/', admin.site.urls),
+    path('admin/', custom_admin_site.urls),
     path('profile/edit/', views_frontend.edit_profile, name='edit_profile'),
     path('profile/<int:user_id>/', views_frontend.profile_view, name='user_profile'),
 ]
