@@ -1,5 +1,6 @@
 import json
 
+import pycountry
 from django import forms
 from .models import Participant, Event, Distance, EventDistanceAssociation, Group, DistanceGroupAssociation, UserProfile
 
@@ -89,6 +90,7 @@ class ParticipantForm(forms.ModelForm):
         ('female', 'Moteris'),
         ('other', 'Kita'),
     ]
+    COUNTRY_CHOICES = [(country.name, country.name) for country in pycountry.countries]
 
     # Participant Fields
     first_name = forms.CharField(max_length=100, required=True)
@@ -105,8 +107,8 @@ class ParticipantForm(forms.ModelForm):
     if_shirt_received = forms.BooleanField(required=False)
     shirt_number = forms.CharField(max_length=10, required=False)
 
-    # Allow free text input for country
-    country = forms.CharField(max_length=100, required=True)
+    # Country drop-down list
+    country = forms.ChoiceField(choices=COUNTRY_CHOICES, required=True)
 
     # Dynamic Distance field based on the selected event
     distance = forms.ModelChoiceField(queryset=Distance.objects.none(), required=True)
@@ -175,6 +177,9 @@ class ParticipantForm(forms.ModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    COUNTRY_CHOICES = [(country.name, country.name) for country in pycountry.countries]
+
+    country = forms.ChoiceField(choices=COUNTRY_CHOICES, required=True)
     class Meta:
         model = UserProfile
         fields = ['first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'country', 'city', 'club', 'shirt_size', 'phone_number']
