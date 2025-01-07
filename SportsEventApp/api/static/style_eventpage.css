@@ -553,3 +553,133 @@ header {
     background-color: #45a049; /* Darker green on hover */
     transform: scale(1.05); /* Slightly increase size on hover */
 }
+
+.login-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* Adjust height to exclude header space */
+    margin-top: 0;
+}
+
+/* Form container styling */
+.login-form-container {
+    background-color: #ffffff; /* White background */
+    padding: 30px; /* Increased padding for a larger form */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+    width: 400px; /* Increased width for a more square appearance */
+}
+
+/* Input fields styling */
+.login-form-container input[type="text"],
+.login-form-container input[type="password"] {
+    width: 80%; /* Full width */
+    padding: 10px;
+    margin: 10px 0; /* Space between fields */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px;
+}
+
+/* Submit button styling */
+.login-form-container button[type="submit"] {
+    width: 100%; /* Full width */
+    padding: 10px;
+    background-color: #28a745;
+    color: white; /* White text */
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-form-container button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Link styled as a button */
+.login-form-container a {
+    display: block;
+    margin: 20px auto 0; /* Centered horizontally with some margin */
+    width: 200px; /* Fixed width */
+    padding: 10px;
+    text-align: center;
+    background-color: #28a745; /* Bootstrap success green */
+    color: white; /* White text */
+    text-decoration: none; /* Remove underline */
+    font-size: 16px;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+}
+
+.login-form-container a:hover {
+    background-color: #218838; /* Darker green */
+}
+
+.registration-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+}
+
+/* Form styling */
+.registration-form-container {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    text-align: left; /* Keep fields aligned to the left */
+}
+
+/* Input fields styling */
+.registration-form-container input[type="text"],
+.registration-form-container input[type="password"],
+.registration-form-container input[type="email"] {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Submit button styling */
+.registration-form-container .registration-submit-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.registration-form-container .registration-submit-btn:hover {
+    background-color: #218838;
+}
+
+/* Bottom-left link styled as a button */
+.registration-form-container .registration-login-link {
+    display: block;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: auto;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.registration-form-container .registration-login-link:hover {
+    background-color: #218838;
+}

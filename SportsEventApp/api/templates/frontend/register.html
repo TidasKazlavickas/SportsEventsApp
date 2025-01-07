@@ -2,11 +2,18 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'style_eventpage.css' %}">
 {% block content %}
-    <h1>Registracija</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registruotis</button>
-    </form>
-    <a href="{% url 'login' %}">Jau turite paskyrą? Prisijunkite čia</a>
+    <div class="header-container">
+        <h1>Registracija</h1>
+    </div>
+    <div class="registration-page-container">
+        <div class="registration-form-container">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="registration-submit-btn">Registruotis</button>
+            </form>
+            <a href="{% url 'login' %}" class="registration-login-link">Jau turite paskyrą? Prisijunkite čia</a>
+        </div>
+    </div>
 {% endblock %}
+
