@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.urls import path
 from api import views, views_frontend
 from django.contrib.auth import views as auth_views
@@ -29,6 +30,7 @@ urlpatterns = [
     path('event/<int:event_id>/upload_photos/', views.upload_event_photos, name='upload_event_photos'),
     path('send-email-to-paid/<int:event_id>/', views.send_email_to_paid, name='send_email_to_paid'),
     path('event/<int:event_id>/upload/', views.upload_participants, name='upload_participants'),
+    path('favicon.ico', lambda request: HttpResponse(status=204)),
 
     # Front-end URLs
     path('events-front/', views_frontend.event_list, name='events'),

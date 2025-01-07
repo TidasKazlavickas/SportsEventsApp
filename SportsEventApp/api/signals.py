@@ -5,8 +5,8 @@ from .models import UserProfile
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    # Ensure a UserProfile is created when a new User is created
-    if created:
+    # Only create the profile if it doesn't already exist
+    if created and not hasattr(instance, 'profile'):
         UserProfile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)

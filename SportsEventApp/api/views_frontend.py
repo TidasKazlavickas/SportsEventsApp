@@ -376,11 +376,6 @@ class CustomLoginView(LoginView):
             UserProfile.objects.create(user=self.request.user)
         return super().form_valid(form)
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
 def save_user_profile(user):
     if not hasattr(user, 'profile'):
         user_profile = UserProfile.objects.create(user=user)
