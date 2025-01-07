@@ -12,7 +12,7 @@ from django.contrib import admin
 
 urlpatterns = [
     # Back-end URLs
-    path('', views.event_list, name='event_list'),
+    path('', views_frontend.event_list, name='events'),
     path('create-event/', views.create_event, name='create_event'),
     path('events/<int:event_id>/', views.event_detail, name='event_detail'),
     path('events/', views.event_list, name='event_list'),

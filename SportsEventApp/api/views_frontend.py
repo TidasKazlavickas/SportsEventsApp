@@ -70,11 +70,20 @@ def participant_register(request, event_id):
     # Get participant for authenticated user, if any
     participant = None
     if request.user.is_authenticated:
-        # Check if the user has a profile, and fetch the participant associated with the user
+        # Ensure the user has a profile; create one if it doesn't exist
+        if not hasattr(request.user, 'profile'):
+            UserProfile.objects.create(user=request.user)
+
+        # Fetch the participant associated with the user
         participant = Participant.objects.filter(user=request.user).first()
 
     # Initialize the form with the event and user profile (if any)
-    form = ParticipantForm(request.POST or None, event=event, user=request.user if request.user.is_authenticated else None, instance=participant)
+    form = ParticipantForm(
+        request.POST or None,
+        event=event,
+        user=request.user if request.user.is_authenticated else None,
+        instance=participant
+    )
 
     # Dynamically hide fields based on the event's configuration
     for label, field_name in LABEL_TO_FIELD.items():
@@ -149,9 +158,6 @@ def participant_register(request, event_id):
         return redirect('payment_options', participant_id=participant.id, event_id=event.id, selected_distance=selected_distance.id)
 
     return render(request, 'frontend/add_participant.html', {'form': form, 'event': event})
-
-
-
 
 def participant_list(request, event_id):
     event = get_object_or_404(Event, id=event_id)
