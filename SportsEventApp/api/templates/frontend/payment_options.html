@@ -10,7 +10,7 @@
 <body>
 
 <h1>Mokėjimo galimybės</h1>
-<p>Jūs užsiregistravote į renginį: {{ participant.event.name }}</p>
+<p class="event-description">Jūs užsiregistravote į renginį: {{ event.name }}</p>
 
 <form method="post">
     {% csrf_token %}
@@ -22,10 +22,10 @@
     <button type="submit">Apmokėti</button>
 </form>
 
-    <button type="submit">Patvirtinti</button>
-</form>
 
-<a href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
+<div class="back-to-events-container">
+    <a class="back-to-events" href="{% url 'events' %}">Grįžti į renginių sąrašą</a>
+</div>
 
 </body>
 </html>

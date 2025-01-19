@@ -555,10 +555,10 @@ header {
 }
 
 .login-page-container {
+    min-height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 80px); /* Adjust height to exclude header space */
     margin-top: 0;
 }
 
@@ -622,7 +622,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 80px);
+    min-height: auto;
 }
 
 /* Form styling */
@@ -683,3 +683,49 @@ header {
 .registration-form-container .registration-login-link:hover {
     background-color: #218838;
 }
+
+#add-participant-front input[type="text"],
+#add-participant-front input[type="email"],
+#add-participant-front select {
+    width: 70%; /* Ensures consistent width for all form elements */
+    padding: 8px;
+    margin: 5px 0 15px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box; /* Ensures padding does not affect width */
+}
+
+.event-description {
+    text-align: center;
+    font-size: 1.4em;
+    margin-top: 10px;
+    color: black;
+}
+
+.back-to-events-container {
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    margin-top: 20px; /* Add some spacing above the button */
+}
+
+.back-to-events {
+    display: inline-block; /* Keeps the button's inline-block nature */
+    text-align: center; /* Centers the text inside the button */
+    padding: 10px 20px; /* Adds padding for a button-like appearance */
+    font-size: 1.1em; /* Slightly larger text */
+    color: white; /* White text for contrast */
+    background-color: #4CAF50; /* Green background */
+    text-decoration: none; /* Removes underline */
+    border-radius: 8px; /* Rounded corners */
+    font-weight: bold; /* Bold text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds subtle shadow */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth hover effects */
+}
+
+.back-to-events:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly enlarges on hover */
+    text-decoration: none; /* Keeps underline removed */
+}
+
