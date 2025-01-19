@@ -11,7 +11,7 @@
 <h1>Redaguoti dalyvį: {{ participant.first_name }} {{ participant.last_name }}</h1>
 
 <!-- Participant Edit Form -->
-<form method="post">
+<form class="edit-participant-form" method="post">
     {% csrf_token %}
     <table>
         <tr>
