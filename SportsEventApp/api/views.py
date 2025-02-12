@@ -340,6 +340,7 @@ def edit_participant(request, participant_id):
             if not DistanceParticipantAssociation.objects.filter(distance=selected_distance, participant=participant).exists():
                 DistanceParticipantAssociation.objects.create(distance=selected_distance, participant=participant)
 
+                # Only assign shirt number if necessary
             if request.POST.get('if_paid') == 'on' and not participant.shirt_number:
                 next_available_number = get_next_available_number(selected_distance)
 
@@ -347,8 +348,14 @@ def edit_participant(request, participant_id):
                 if next_available_number is not None:
                     participant.shirt_number = next_available_number
                     participant.save()
+            else:
+                participant.save()
 
             return redirect('event_detail', event_id=event.id)
+        else:
+            print("Form is not valid:", form.errors)  # Debugging output
+        return render(request, 'api/edit_participant.html', {'form': form, 'participant': participant, 'event': event})
+
     else:
         # Populate the form with the current participant data and selected distance
         form = ParticipantForm(event=event, instance=participant)

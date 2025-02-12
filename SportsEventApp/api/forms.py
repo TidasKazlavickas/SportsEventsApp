@@ -175,6 +175,13 @@ class ParticipantForm(forms.ModelForm):
             self.fields['gender'].initial = user_profile.gender
             self.fields['date_of_birth'].initial = user_profile.date_of_birth
 
+    def clean_shirt_number(self):
+        shirt_number = self.cleaned_data.get('shirt_number')
+        # If the shirt number is an empty string, return None (or some default value)
+        if shirt_number == '':
+            return None
+        return shirt_number
+
 
 class UserProfileForm(forms.ModelForm):
     COUNTRY_CHOICES = [(country.name, country.name) for country in pycountry.countries]
