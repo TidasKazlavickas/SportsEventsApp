@@ -68,13 +68,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0E97F8C023894FD8AC3BDDA6A05D5A3C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F14367FE6B6D4B0DBC743DD742399149 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_57895948AC16458D8C8850AD39F1D4D1 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_43098856964B4D93B986496D91F64577 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FC81EE2D14134215A23EB6AE947FD294 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C0C0396241924D3F976F507818A438E7 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'sportorenginiai'
+          slot-name: 'Production'
           
