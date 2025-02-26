@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ou*3oj7$o9fz-8s%%p*beq7#c+21el002#h_cu(m&69fzfgxg%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://sportorenginiai.azurewebsites.net']
+ALLOWED_HOSTS = ['https://sportorenginiai.azurewebsites.net', '127.0.0.1']
 
 MEDIA_URL = '/media/'
 

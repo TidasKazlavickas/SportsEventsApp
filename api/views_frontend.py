@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from django.core.mail import send_mail
 from paypalrestsdk import Payment
 from django.http import HttpResponseRedirect, HttpResponse
@@ -94,6 +95,18 @@ def participant_register(request, event_id):
                     form.fields[field_name].required = False
 
     if form.is_valid():
+        first_name = form.cleaned_data['first_name'].strip()
+        last_name = form.cleaned_data['last_name'].strip()
+
+        # Check if a participant with the same first and last name already exists
+        existing_participant = Participant.objects.filter(
+            first_name__iexact=first_name, last_name__iexact=last_name
+        ).first()
+
+        if existing_participant:
+            messages.error(request, "Dalyvis su šiuo vardu ir pavarde jau egzistuoja.")
+            return render(request, 'frontend/add_participant.html', {'event': event, 'form': form})
+
         participant = form.save(commit=False)  # Don't save to DB yet
 
         # Link the participant to the logged-in user (if any)

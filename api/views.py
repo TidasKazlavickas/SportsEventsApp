@@ -180,7 +180,7 @@ def participant_list(request):
 
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    participants = Participant.objects.filter(events__id=event_id)
+    participants = Participant.objects.filter(events__id=event_id).order_by('shirt_number')
     distances = Distance.objects.filter(eventdistanceassociation__event=event)
     # Assuming `distances` is a queryset of Distance objects
     groups = Group.objects.filter(
@@ -201,42 +201,42 @@ def event_detail(request, event_id):
 
     # Apply filters
     if search_first_name:
-        participants = participants.filter(first_name__icontains=search_first_name)
+        participants = participants.filter(first_name__icontains=search_first_name).order_by('shirt_number')
 
     if search_last_name:
-        participants = participants.filter(last_name__icontains=search_last_name)
+        participants = participants.filter(last_name__icontains=search_last_name).order_by('shirt_number')
 
     if search_email:
-        participants = participants.filter(email__icontains=search_email)
+        participants = participants.filter(email__icontains=search_email).order_by('shirt_number')
 
     if search_country:
-        participants = participants.filter(country__icontains=search_country)
+        participants = participants.filter(country__icontains=search_country).order_by('shirt_number')
 
     if search_status == "paid":
-        participants = participants.filter(if_paid=True)
+        participants = participants.filter(if_paid=True).order_by('shirt_number')
     elif search_status == "not_paid":
-        participants = participants.filter(if_paid=False)
+        participants = participants.filter(if_paid=False).order_by('shirt_number')
 
     if search_number:
-        participants = participants.filter(id=search_number)
+        participants = participants.filter(id=search_number).order_by('shirt_number')
 
     if search_gender:
-        participants = participants.filter(gender=search_gender)
+        participants = participants.filter(gender=search_gender).order_by('shirt_number')
 
     if search_club:
-        participants = participants.filter(club__icontains=search_club)
+        participants = participants.filter(club__icontains=search_club).order_by('shirt_number')
 
     if search_group:
-        participants = participants.filter(events__group=search_group)
+        participants = participants.filter(events__group=search_group).order_by('shirt_number')
 
     if search_distance:
-        participants = participants.filter(distances__id=search_distance)
+        participants = participants.filter(distances__id=search_distance).order_by('shirt_number')
 
     if number_received == "yes":
-        participants = participants.filter(if_number_received=True)
+        participants = participants.filter(if_number_received=True).order_by('shirt_number')
 
     if shirt_assigned == "yes":
-        participants = participants.filter(if_shirt_received=True)
+        participants = participants.filter(if_shirt_received=True).order_by('shirt_number')
 
     for participant in participants:
         participant.groups = Group.objects.filter(participant_groups__participant=participant)
@@ -376,6 +376,18 @@ def add_participant(request, event_id):
     if request.method == 'POST':
         form = ParticipantForm(request.POST, event=event)
         if form.is_valid():
+            first_name = form.cleaned_data['first_name'].strip()
+            last_name = form.cleaned_data['last_name'].strip()
+
+            # Check if a participant with the same first and last name already exists
+            existing_participant = Participant.objects.filter(
+                first_name__iexact=first_name, last_name__iexact=last_name
+            ).first()
+
+            if existing_participant:
+                messages.error(request, "Dalyvis su šiuo vardu ir pavarde jau egzistuoja.")
+                return render(request, 'api/add_participant.html', {'event': event, 'form': form})
+
             participant = form.save(commit=False)  # Do not save to DB yet
 
             # Handle empty shirt_number by setting it to None
@@ -409,12 +421,10 @@ def add_participant(request, event_id):
             for group in eligible_groups:
                 age_range = json.loads(group.age)
                 if age_range['age_from'] <= age <= age_range['age_to']:
-                    # Calculate the closeness of the group based on age range
                     age_diff_from = age - age_range['age_from']
                     age_diff_to = age_range['age_to'] - age
                     smallest_age_diff_group = min(age_diff_from, age_diff_to)
 
-                    # Check if this group is closer than the previous closest
                     if smallest_age_diff is None or smallest_age_diff_group < smallest_age_diff:
                         smallest_age_diff = smallest_age_diff_group
                         closest_group = group
@@ -426,7 +436,6 @@ def add_participant(request, event_id):
             if request.POST.get('if_paid') == 'on' and participant.shirt_number is None:
                 next_available_number = get_next_available_number(selected_distance)
 
-                # Only assign if a valid number is available
                 if next_available_number is not None:
                     participant.shirt_number = next_available_number
                     participant.save()

@@ -9,6 +9,15 @@
 </head>
 <body>
 <h1>Pridėti dalyvį į renginį: {{ event.name }}</h1>
+{% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 <!-- Participant Registration Form -->
 <form method="post">
