@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ou*3oj7$o9fz-8s%%p*beq7#c+21el002#h_cu(m&69fzfgxg%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://sportorenginiai.azurewebsites.net', '127.0.0.1']
+ALLOWED_HOSTS = ['*', 'https://sportorenginiai.azurewebsites.net', '127.0.0.1']
 
 MEDIA_URL = '/media/'
 
@@ -152,7 +152,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Security settings
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = os.getenv("ENABLE_SSL", "False") == "True"  # Enable only if needed
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # Ensure HTTPS is detected
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
@@ -174,3 +175,16 @@ LOGGING = {
         },
     },
 }
+from django.middleware.security import SecurityMiddleware
+
+class AllowAzureHealthCheckMiddleware(SecurityMiddleware):
+    def process_request(self, request):
+        # Allow internal Azure health checks over HTTP
+        if request.META.get("REMOTE_ADDR", "").startswith("127.") or request.META.get("HTTP_X_FORWARDED_FOR", "").startswith("127."):
+            return
+        # Otherwise, enforce HTTPS
+        if not request.is_secure():
+            from django.http import HttpResponsePermanentRedirect
+            return HttpResponsePermanentRedirect(f"https://{request.get_host()}{request.get_full_path()}")
+
+MIDDLEWARE.insert(0, "sportsapp.settings.AllowAzureHealthCheckMiddleware")  # Add this line
