@@ -35,7 +35,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+CSRF_TRUSTED_ORIGINS = ['*', 'https://sportorenginiai.azurewebsites.net', '127.0.0.1']
 
 # Mailjet email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
